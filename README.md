@@ -1,46 +1,91 @@
 # Rwanda School Mapper
 
-A modern web application for mapping schools in Rwanda.
+> A Final Year Project
 
-## Technologies Used
+## 📘 Project Overview
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+**Rwanda School Mapper** is a web-based geospatial application developed as part of a Final Year Project. The system is designed to visualize and manage school location data across Rwanda through an interactive digital map interface.
 
-## Getting Started
+The primary objective of this project is to improve accessibility, organization, and analysis of educational geographic data by leveraging modern web technologies.
 
-### Prerequisites
+---
 
-- Node.js & npm installed
+## 🎯 Project Objectives
 
-### Installation
+- To design and develop an interactive school mapping system
+- To provide a centralized digital visualization of school locations
+- To enhance accessibility of geospatial educational data
+- To apply modern frontend technologies in solving real-world spatial problems
 
-1. Clone the repository:
-   ```sh
-   git clone <YOUR_GIT_URL>
-   ```
+---
 
-2. Navigate to the project directory:
-   ```sh
-   cd rwanda-school-mapper
-   ```
+## 🛠️ Technologies Used
 
-3. Install the necessary dependencies:
-   ```sh
-   npm install
-   ```
+| Technology | Purpose |
+|---|---|
+| **React** | Frontend framework |
+| **TypeScript** | Type-safe development |
+| **Vite** | Build tool and development server |
+| **Tailwind CSS** | UI styling and responsiveness |
 
-4. Start the development server:
-   ```sh
-   npm run dev
-   ```
+---
 
-## Scripts
+## ⚙️ System Status
 
-- `npm run dev`: Start development server
-- `npm run build`: Build for production
-- `npm run lint`: Run ESLint
-- `npm run test`: Run tests with Vitest
+> 🚧 **This project is currently under development.**
+
+The current version represents a prototype implementation. Core features are being progressively improved, tested, and refined.
+
+---
+
+## 🔮 Upcoming Features & Integrations
+
+The following enhancements are planned for future development phases:
+
+- Advanced filtering and search functionality
+- Backend integration for dynamic data management
+- Database connectivity for persistent storage
+- User authentication and role-based access
+- GIS data layer enhancements
+- API integrations for external data sources
+- Performance optimization and deployment
+
+---
+
+## 📦 Installation & Setup
+
+**1. Clone the repository:**
+
+```bash
+git clone https://github.com/your-username/rwanda-school-mapper.git
+```
+
+**2. Navigate into the project directory:**
+
+```bash
+cd rwanda-school-mapper
+```
+
+**3. Install dependencies:**
+
+```bash
+npm install
+```
+
+**4. Run the development server:**
+
+```bash
+npm run dev
+```
+
+---
+
+## 🎓 Academic Context
+
+This system is developed as part of an academic requirement for the completion of a Final Year Project. It demonstrates practical application of geospatial concepts, web development technologies, and user interface design principles.
+
+---
+
+## 📄 License
+
+This project is intended for **academic and research purposes** only.
