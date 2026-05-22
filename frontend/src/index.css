@@ -1,0 +1,264 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=IBM+Plex+Mono:wght@400;600&family=Outfit:wght@300;400;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SSEVMS Design System - Rwanda School Verification Platform
+   Theme: Blue-Green (GIS/Education inspired)
+   Professional government/NGO aesthetic
+*/
+
+@layer base {
+  :root {
+    /* Background: Deep slate / dark ink */
+    --background: 210 40% 10%;
+    --foreground: 40 31% 90%;
+
+    --card: 212 31% 11%;
+    --card-foreground: 40 31% 90%;
+
+    --popover: 212 31% 12%;
+    --popover-foreground: 40 31% 90%;
+
+    /* Primary: Warm terracotta */
+    --primary: 19 63% 47%;
+    --primary-foreground: 40 31% 95%;
+
+    /* Secondary: Muted gold */
+    --secondary: 41 63% 55%;
+    --secondary-foreground: 210 40% 10%;
+
+    /* Muted tones: Slate blue */
+    --muted: 212 31% 15%;
+    --muted-foreground: 211 18% 61%;
+
+    /* Accent: Translucent teal glow */
+    --accent: 180 61% 26%;
+    --accent-foreground: 40 31% 95%;
+
+    /* Status colors: Forest green, Terracotta, Gold */
+    --destructive: 0 62% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 150 33% 36%;
+    --success-foreground: 40 31% 95%;
+
+    --warning: 41 63% 55%;
+    --warning-foreground: 210 40% 10%;
+
+    --info: 180 61% 35%;
+    --info-foreground: 0 0% 100%;
+
+    /* Verification status colors */
+    --verified: 150 33% 36%;
+    --pending: 41 63% 55%;
+    --unverified: 211 18% 45%;
+    --rejected: 0 62% 51%;
+
+    /* UI Elements */
+    --border: 212 31% 20%;
+    --input: 212 31% 20%;
+    --ring: 19 63% 47%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar styling: Deep Mission Control */
+    --sidebar-background: 210 40% 7%;
+    --sidebar-foreground: 211 18% 75%;
+    --sidebar-primary: 19 63% 47%;
+    --sidebar-primary-foreground: 40 31% 95%;
+    --sidebar-accent: 212 31% 14%;
+    --sidebar-accent-foreground: 40 31% 95%;
+    --sidebar-border: 212 31% 18%;
+    --sidebar-ring: 19 63% 47%;
+
+    /* Map specific */
+    --map-marker-verified: 150 33% 36%;
+    --map-marker-pending: 41 63% 55%;
+    --map-marker-unverified: 211 18% 45%;
+    --map-marker-rejected: 0 62% 51%;
+
+    /* Shadows: Mission control glow */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.6), 0 5px 10px rgba(0, 0, 0, 0.4);
+    --shadow-glow-primary: 0 0 15px hsla(19, 63%, 47%, 0.3);
+  }
+
+  /* Force Dark Theme by default for Mission Control feel */
+  :root,
+  .dark {
+    color-scheme: dark;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer components {
+
+  /* Stats card styling */
+  .stats-card {
+    @apply bg-card rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300;
+    box-shadow: var(--shadow-md);
+  }
+
+  .stats-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+
+  /* Status badge variants */
+  .status-badge {
+    @apply px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide;
+  }
+
+  .status-verified {
+    @apply bg-success/15 text-success;
+  }
+
+  .status-pending {
+    @apply bg-warning/15 text-warning;
+  }
+
+  .status-unverified {
+    @apply bg-muted text-muted-foreground;
+  }
+
+  .status-rejected {
+    @apply bg-destructive/15 text-destructive;
+  }
+
+  /* Map container */
+  .map-container {
+    @apply rounded-xl overflow-hidden;
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Sidebar item active state */
+  .sidebar-item-active {
+    @apply bg-sidebar-accent text-sidebar-primary font-medium;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Data table styling */
+  .data-table {
+    @apply w-full text-sm;
+  }
+
+  .data-table th {
+    @apply px-4 py-3 text-left font-semibold text-muted-foreground uppercase tracking-wide text-xs bg-muted/50;
+  }
+
+  .data-table td {
+    @apply px-4 py-4 border-b border-border;
+  }
+
+  .data-table tr:hover td {
+    @apply bg-muted/30;
+  }
+}
+
+/* Leaflet custom styling */
+.leaflet-container {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  z-index: 1;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 0.75rem !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  min-width: 280px;
+}
+
+/* Custom map markers */
+.custom-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+}
+
+.custom-marker:hover {
+  transform: scale(1.1);
+}
+
+.custom-marker.verified {
+  background: hsl(142, 71%, 45%);
+}
+
+.custom-marker.pending {
+  background: hsl(38, 92%, 50%);
+}
+
+.custom-marker.unverified {
+  background: hsl(215, 15%, 60%);
+}
+
+.custom-marker.rejected {
+  background: hsl(0, 72%, 51%);
+}
+
+/* Cluster marker styling */
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+  background: hsl(173, 58%, 39%) !important;
+  opacity: 0.9;
+}
+
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+  background: hsl(173, 58%, 49%) !important;
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
