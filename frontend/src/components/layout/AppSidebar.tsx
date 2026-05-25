@@ -27,6 +27,7 @@ import {
   Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 
 const mainNavItems = [
   {
@@ -72,7 +73,7 @@ const adminNavItems = [
     icon: Users,
   },
   {
-    title: 'Audit Logs',
+    title: 'Audit Trail',
     href: '/audit',
     icon: History,
   },
@@ -84,8 +85,10 @@ const adminNavItems = [
 ];
 
 export function AppSidebar() {
+  const { user } = useAuth();
   const location = useLocation();
   const currentPath = location.pathname;
+  const isAdmin = user?.role === 'admin';
 
   const isActive = (path: string) => {
     if (path === '/') return currentPath === '/';
@@ -193,7 +196,8 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Administration */}
+        {/* Administration — admin only */}
+        {isAdmin && (
         <SidebarGroup className="mt-8">
           <SidebarGroupLabel className="text-[10px] text-[#8A9BAD]/40 uppercase tracking-[0.3em] font-black px-4 mb-4">
             Governance
@@ -229,6 +233,7 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-white/5 p-6 bg-black/20">

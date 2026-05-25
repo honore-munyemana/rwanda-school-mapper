@@ -2,7 +2,10 @@ import "dotenv/config";
 import schoolRoutes from "./routes/schoolRoutes.js";
 import verifyRoutes from "./routes/verifyRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import auditRoutes from "./routes/auditRoutes.js";
+import schoolHistoryRoutes from "./routes/schoolHistoryRoutes.js";
 import pool from "./config/db.js";
+import { runMigrations } from "./migrations/runMigrations.js";
 import express from "express";
 import cors from "cors";
 
@@ -29,7 +32,16 @@ app.get("/db-test", async (req, res) => {
 app.use("/schools", schoolRoutes);
 app.use("/verify", verifyRoutes);
 app.use("/auth", authRoutes);
+app.use("/audit", auditRoutes);
+app.use("/schools", schoolHistoryRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+runMigrations()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Migration failed:", error);
+    process.exit(1);
+  });

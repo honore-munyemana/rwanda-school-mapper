@@ -5,6 +5,18 @@ import roleMiddleware from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
+const insertVerificationLog = async (
+  pool,
+  { schoolId, verifierId, latitude, longitude, distanceMeters, result }
+) => {
+  await pool.query(
+    `INSERT INTO verification_logs
+     (school_id, verifier_id, verifier_latitude, verifier_longitude, distance_meters, result)
+     VALUES ($1, $2, $3, $4, $5, $6)`,
+    [schoolId, verifierId, latitude, longitude, distanceMeters, result]
+  );
+};
+
 router.post("/", authMiddleware, roleMiddleware("admin", "validator"), async (req, res) => {
   try {
     const { school_id, latitude, longitude, notes } = req.body;
@@ -19,13 +31,19 @@ router.post("/", authMiddleware, roleMiddleware("admin", "validator"), async (re
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    const verifierId = req.user.id;
+
     // Check distance using PostGIS ST_DWithin (<= 100 meters)
     const checkQuery = `
       SELECT ST_DWithin(
         location::geography,
         ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
         100
-      ) AS is_within
+      ) AS is_within,
+      ST_Distance(
+        location::geography,
+        ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
+      ) AS distance_meters
       FROM schools
       WHERE id = $3;
     `;
@@ -38,9 +56,18 @@ router.post("/", authMiddleware, roleMiddleware("admin", "validator"), async (re
       return res.status(404).json({ error: "School not found" });
     }
 
-    const { is_within } = checkResult.rows[0];
+    const { is_within, distance_meters } = checkResult.rows[0];
+    const distanceMeters = Number(parseFloat(distance_meters).toFixed(2));
 
     if (!is_within) {
+      await insertVerificationLog(pool, {
+        schoolId,
+        verifierId,
+        latitude,
+        longitude,
+        distanceMeters,
+        result: "rejected",
+      });
       return res.status(400).json({ error: "Too far from school to verify" });
     }
 
@@ -60,6 +87,15 @@ router.post("/", authMiddleware, roleMiddleware("admin", "validator"), async (re
       UPDATE schools SET status = 'Verified' WHERE id = $1 RETURNING *;
     `;
     await pool.query(updateQuery, [schoolId]);
+
+    await insertVerificationLog(pool, {
+      schoolId,
+      verifierId,
+      latitude,
+      longitude,
+      distanceMeters,
+      result: "verified",
+    });
 
     res.status(200).json({ message: "School verified successfully" });
   } catch (error) {
