@@ -13,6 +13,10 @@ const initialForm = {
   district: "",
   latitude: "",
   longitude: "",
+  has_internet: false,
+  has_smart_classroom: false,
+  has_playground: false,
+  has_electricity: false,
 };
 
 export default function SubmitSchoolPage() {
@@ -100,6 +104,10 @@ export default function SubmitSchoolPage() {
           district: form.district.trim(),
           latitude: lat,
           longitude: lng,
+          has_internet: form.has_internet,
+          has_smart_classroom: form.has_smart_classroom,
+          has_playground: form.has_playground,
+          has_electricity: form.has_electricity,
         }),
       });
 
@@ -212,6 +220,65 @@ export default function SubmitSchoolPage() {
                     placeholder="Capture location first"
                     className="bg-[#0F1923]/60 border-white/10 text-[#8A9BAD] font-mono text-sm cursor-not-allowed"
                   />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Label className="font-mono text-xs uppercase tracking-widest text-[#8A9BAD] font-bold">
+                  Infrastructure Indicators
+                </Label>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="flex items-center space-x-3 bg-[#0F1923]/60 p-4 rounded-md border border-white/10">
+                    <input
+                      type="checkbox"
+                      id="has_internet"
+                      checked={form.has_internet}
+                      onChange={(e) => setForm((prev) => ({ ...prev, has_internet: e.target.checked }))}
+                      className="h-4 w-4 rounded border-white/20 bg-[#0F1923] text-[#C4622D] focus:ring-[#C4622D] focus:ring-offset-0 cursor-pointer accent-[#C4622D]"
+                    />
+                    <Label htmlFor="has_internet" className="font-mono text-xs uppercase tracking-widest text-[#8A9BAD] cursor-pointer select-none">
+                      Has Internet
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-3 bg-[#0F1923]/60 p-4 rounded-md border border-white/10">
+                    <input
+                      type="checkbox"
+                      id="has_smart_classroom"
+                      checked={form.has_smart_classroom}
+                      onChange={(e) => setForm((prev) => ({ ...prev, has_smart_classroom: e.target.checked }))}
+                      className="h-4 w-4 rounded border-white/20 bg-[#0F1923] text-[#C4622D] focus:ring-[#C4622D] focus:ring-offset-0 cursor-pointer accent-[#C4622D]"
+                    />
+                    <Label htmlFor="has_smart_classroom" className="font-mono text-xs uppercase tracking-widest text-[#8A9BAD] cursor-pointer select-none">
+                      Has Smart Classroom
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-3 bg-[#0F1923]/60 p-4 rounded-md border border-white/10">
+                    <input
+                      type="checkbox"
+                      id="has_playground"
+                      checked={form.has_playground}
+                      onChange={(e) => setForm((prev) => ({ ...prev, has_playground: e.target.checked }))}
+                      className="h-4 w-4 rounded border-white/20 bg-[#0F1923] text-[#C4622D] focus:ring-[#C4622D] focus:ring-offset-0 cursor-pointer accent-[#C4622D]"
+                    />
+                    <Label htmlFor="has_playground" className="font-mono text-xs uppercase tracking-widest text-[#8A9BAD] cursor-pointer select-none">
+                      Has Playground
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-3 bg-[#0F1923]/60 p-4 rounded-md border border-white/10">
+                    <input
+                      type="checkbox"
+                      id="has_electricity"
+                      checked={form.has_electricity}
+                      onChange={(e) => setForm((prev) => ({ ...prev, has_electricity: e.target.checked }))}
+                      className="h-4 w-4 rounded border-white/20 bg-[#0F1923] text-[#C4622D] focus:ring-[#C4622D] focus:ring-offset-0 cursor-pointer accent-[#C4622D]"
+                    />
+                    <Label htmlFor="has_electricity" className="font-mono text-xs uppercase tracking-widest text-[#8A9BAD] cursor-pointer select-none">
+                      Has Electricity
+                    </Label>
+                  </div>
                 </div>
               </div>
 
