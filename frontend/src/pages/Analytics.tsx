@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { VerificationChart } from '@/components/dashboard/VerificationChart';
@@ -31,6 +31,7 @@ import {
   FileText
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -52,7 +53,67 @@ import { Info } from 'lucide-react';
 
 export default function Analytics() {
   const { stats } = useData();
+  const { token } = useAuth();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [overview, setOverview] = useState<any>(null);
+  const [districts, setDistricts] = useState<any>(null);
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(true);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        if (!token) return;
+
+        const [overviewRes, districtsRes] = await Promise.all([
+          fetch("http://localhost:5000/analytics/overview", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch("http://localhost:5000/analytics/districts", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        if (overviewRes.ok && districtsRes.ok) {
+          const overviewData = await overviewRes.json();
+          const districtsData = await districtsRes.json();
+          setOverview(overviewData);
+          setDistricts(districtsData);
+        }
+      } catch (error) {
+        console.error("Failed to fetch analytics from backend:", error);
+      } finally {
+        setIsLoadingAnalytics(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, [token]);
+
+  const activeOverview = overview || {
+    totalSchools: stats.total,
+    verifiedSchools: stats.verified,
+    pendingSchools: stats.pending,
+    unverifiedSchools: stats.unverified,
+    rejectedSchools: stats.rejected,
+    averageSmartScore: 0,
+    schoolsWithInternet: 0,
+    schoolsWithElectricity: 0,
+    schoolsWithPlayground: 0,
+    schoolsWithSmartClassroom: 0,
+    internetPercentage: 0,
+    electricityPercentage: 0,
+    playgroundPercentage: 0,
+    smartClassroomPercentage: 0,
+    distribution: {
+      score0: 0,
+      score1: 0,
+      score2: 0,
+      score3: 0,
+      score4: 0,
+    }
+  };
+
+  const activeDistricts = districts || stats.byDistrict;
 
   const educationLevelData = Object.entries(stats.byEducationLevel).map(([name, value]) => ({
     name,
@@ -70,8 +131,20 @@ export default function Analytics() {
     { month: 'Sep', verified: 10, pending: 6 },
     { month: 'Oct', verified: 15, pending: 8 },
     { month: 'Nov', verified: 18, pending: 5 },
-    { month: 'Dec', verified: stats.verified, pending: stats.pending },
+    { month: 'Dec', verified: activeOverview.verifiedSchools, pending: activeOverview.pendingSchools },
   ];
+
+  const scoreDistributionData = [
+    { score: 'Score 0', count: activeOverview.distribution.score0 },
+    { score: 'Score 1', count: activeOverview.distribution.score1 },
+    { score: 'Score 2', count: activeOverview.distribution.score2 },
+    { score: 'Score 3', count: activeOverview.distribution.score3 },
+    { score: 'Score 4', count: activeOverview.distribution.score4 },
+  ];
+
+  const verificationRate = activeOverview.totalSchools > 0
+    ? Number(((activeOverview.verifiedSchools / activeOverview.totalSchools) * 100).toFixed(1))
+    : stats.verificationRate;
 
   const colors = ['hsl(173, 58%, 39%)', 'hsl(199, 89%, 48%)', 'hsl(38, 92%, 50%)', 'hsl(142, 71%, 45%)'];
 
@@ -93,9 +166,9 @@ export default function Analytics() {
         {/* Header with Report Actions */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 border-l-4 border-[#C4622D] pl-6 py-2">
           <div className="space-y-2">
-            <h1 className="text-3xl font-display font-bold tracking-tight text-white uppercase italic">Strategic Intel</h1>
+            <h1 className="text-3xl font-display font-bold tracking-tight text-white uppercase italic">Smart School Analytics</h1>
             <p className="font-mono text-sm text-[#8A9BAD] uppercase tracking-[0.2em]">
-              National performance monitoring and high-level data auditing.
+              Infrastructure indicators and educational intelligence dashboard.
             </p>
           </div>
           <div className="flex gap-4">
@@ -122,14 +195,14 @@ export default function Analytics() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <StatsCard
                 title="Total Schools"
-                value={stats.total}
+                value={activeOverview.totalSchools}
                 description="Registered in system"
                 icon={<School className="h-5 w-5" />}
                 variant="primary"
               />
               <StatsCard
                 title="Verification Rate"
-                value={`${stats.verificationRate}%`}
+                value={`${verificationRate}%`}
                 description="Schools verified"
                 icon={<TrendingUp className="h-5 w-5" />}
                 variant="success"
@@ -137,15 +210,15 @@ export default function Analytics() {
               />
               <StatsCard
                 title="Districts Covered"
-                value={Object.keys(stats.byDistrict).length}
+                value={Object.keys(activeDistricts).length}
                 description="Active districts"
                 icon={<MapPin className="h-5 w-5" />}
                 variant="default"
               />
               <StatsCard
-                title="Education Levels"
-                value={Object.keys(stats.byEducationLevel).length}
-                description="Categories tracked"
+                title="Average Smart Score"
+                value={`${activeOverview.averageSmartScore} / 4.0`}
+                description="Infrastructure index"
                 icon={<GraduationCap className="h-5 w-5" />}
                 variant="default"
               />
@@ -155,10 +228,10 @@ export default function Analytics() {
             <div className="grid gap-6 lg:grid-cols-2">
               <VerificationChart
                 data={{
-                  verified: stats.verified,
-                  pending: stats.pending,
-                  unverified: stats.unverified,
-                  rejected: stats.rejected,
+                  verified: activeOverview.verifiedSchools,
+                  pending: activeOverview.pendingSchools,
+                  unverified: activeOverview.unverifiedSchools,
+                  rejected: activeOverview.rejectedSchools,
                 }}
               />
 
@@ -203,6 +276,79 @@ export default function Analytics() {
                         name="Verified Records"
                       />
                     </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* Infrastructure indicators and smart score distribution */}
+            <div className="grid gap-6 lg:grid-cols-2 mt-6">
+              {/* Infrastructure Indicators */}
+              <div className="bg-[#141C25]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-8 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-[#C4622D]/40" />
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-[#C4622D] mb-6 flex items-center justify-between">
+                  <span>Infrastructure Penetration</span>
+                  <div className="flex gap-1 opacity-50">
+                    <div className="h-1 w-1 bg-[#C4622D]" />
+                    <div className="h-1 w-1 bg-[#C4622D]" />
+                    <div className="h-1 w-1 bg-[#C4622D]" />
+                  </div>
+                </h3>
+                
+                <div className="space-y-6">
+                  {[
+                    { label: "Internet Access", pct: activeOverview.internetPercentage, count: activeOverview.schoolsWithInternet, color: "#3b82f6" },
+                    { label: "Electricity connection", pct: activeOverview.electricityPercentage, count: activeOverview.schoolsWithElectricity, color: "#f59e0b" },
+                    { label: "Smart Classroom", pct: activeOverview.smartClassroomPercentage, count: activeOverview.schoolsWithSmartClassroom, color: "#10b981" },
+                    { label: "Playground facilities", pct: activeOverview.playgroundPercentage, count: activeOverview.schoolsWithPlayground, color: "#ec4899" }
+                  ].map(item => (
+                    <div key={item.label} className="space-y-2">
+                      <div className="flex justify-between text-xs font-mono">
+                        <span className="text-[#8A9BAD] uppercase tracking-wider">{item.label}</span>
+                        <span className="text-white font-bold">{item.pct}% ({item.count} schools)</span>
+                      </div>
+                      <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${item.pct}%`, backgroundColor: item.color }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Smart Score Distribution Chart */}
+              <div className="bg-[#141C25]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-8 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-[#D4A847]/40" />
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-[#D4A847] mb-6 flex items-center justify-between">
+                  <span>Smart Score Distribution</span>
+                  <div className="flex gap-1 opacity-50">
+                    <div className="h-1 w-1 bg-[#D4A847]" />
+                    <div className="h-1 w-1 bg-[#D4A847]" />
+                    <div className="h-1 w-1 bg-[#D4A847]" />
+                  </div>
+                </h3>
+                
+                <div className="h-[280px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={scoreDistributionData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                      <XAxis dataKey="score" stroke="#8A9BAD" fontSize={10} tickLine={false} axisLine={false} tick={{ fontFamily: '"IBM Plex Mono", monospace', fontWeight: 600 }} />
+                      <YAxis stroke="#8A9BAD" fontSize={10} tickLine={false} axisLine={false} tick={{ fontFamily: '"IBM Plex Mono", monospace', fontWeight: 600 }} allowDecimals={false} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#0F1923',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: '12px',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                          fontFamily: '"IBM Plex Mono", monospace',
+                          fontSize: '10px',
+                          color: '#8A9BAD',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.1em'
+                        }}
+                        cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                      />
+                      <Bar dataKey="count" fill="#D4A847" radius={[4, 4, 0, 0]} name="School Count" />
+                    </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>

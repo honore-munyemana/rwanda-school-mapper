@@ -4,6 +4,7 @@ import verifyRoutes from "./routes/verifyRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import auditRoutes from "./routes/auditRoutes.js";
 import schoolHistoryRoutes from "./routes/schoolHistoryRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 import pool from "./config/db.js";
 import { runMigrations } from "./migrations/runMigrations.js";
 import express from "express";
@@ -34,6 +35,7 @@ app.use("/verify", verifyRoutes);
 app.use("/auth", authRoutes);
 app.use("/audit", auditRoutes);
 app.use("/schools", schoolHistoryRoutes);
+app.use("/analytics", analyticsRoutes);
 
 runMigrations()
   .then(() => {
