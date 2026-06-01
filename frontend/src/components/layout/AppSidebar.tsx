@@ -97,12 +97,12 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="border-r border-white/5 bg-[#0A0F14] shadow-2xl">
-      <SidebarHeader className="p-8 border-b border-white/5">
+      <SidebarHeader className="p-2 group-data-[state=expanded]:p-8 border-b border-white/5 transition-all duration-200">
         <Link to="/" className="flex items-center gap-4 group">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#C4622D] shadow-[0_0_15px_rgba(196,98,45,0.3)] group-hover:scale-110 transition-transform">
-            <Globe className="h-7 w-7 text-white" />
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-transparent group-hover:scale-110 transition-transform">
+            <img src="/logo/logo-icon.svg" alt="SSEVMS Logo" className="h-12 w-12" />
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col group-data-[state=collapsed]:hidden">
             <div className="flex items-center gap-2">
               <span className="text-xl font-display font-black text-white tracking-tighter">
                 SSEVMS

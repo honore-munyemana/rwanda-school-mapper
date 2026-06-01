@@ -17,7 +17,10 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.1",
-    "pg": "^8.20.0"
+    "pdfkit": "^0.18.0",
+    "pdfkit-table": "^0.2.11",
+    "pg": "^8.20.0",
+    "svg-to-pdfkit": "^0.1.8"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <!-- Definitions for gradients and filters -->
+  <defs>
+    <!-- Premium subtle gradient for the navy pin -->
+    <linearGradient id="pinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141C25" />
+      <stop offset="100%" stop-color="#0F1923" />
+    </linearGradient>
+  </defs>
+
+  <!-- Location Pin Outline/Badge -->
+  <path d="M 50 92 C 20 68 18 42 18 38 A 32 32 0 0 1 82 38 C 82 42 80 68 50 92 Z" 
+        fill="url(#pinGradient)" 
+        stroke="#D4A847" 
+        stroke-width="2" 
+        stroke-linejoin="round" />
+
+  <!-- Dotted Radar/GPS lines representing geospatial mapping -->
+  <circle cx="50" cy="38" r="24" fill="none" stroke="#D4A847" stroke-width="0.75" stroke-dasharray="3,3" opacity="0.4" />
+  <circle cx="50" cy="38" r="16" fill="none" stroke="#D4A847" stroke-width="0.75" stroke-dasharray="2,2" opacity="0.3" />
+
+  <!-- School Building Facade (White) -->
+  <!-- Roof -->
+  <polygon points="50,22 28,38 72,38" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+  
+  <!-- Columns as data/signal bars (Smart school) -->
+  <!-- Left column -->
+  <line x1="36" y1="38" x2="36" y2="56" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" />
+  <!-- Center column -->
+  <line x1="50" y1="38" x2="50" y2="56" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" />
+  <!-- Right column -->
+  <line x1="64" y1="38" x2="64" y2="56" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" />
+
+  <!-- School Base -->
+  <line x1="28" y1="56" x2="72" y2="56" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" />
+
+  <!-- GPS Coordinate / Node at the bottom representing verification location -->
+  <g transform="translate(50, 72)">
+    <!-- Connection lines to school base corners and pin tip -->
+    <line x1="0" y1="0" x2="-14" y2="-16" stroke="#D4A847" stroke-width="1" stroke-dasharray="2,2" opacity="0.8" />
+    <line x1="0" y1="0" x2="14" y2="-16" stroke="#D4A847" stroke-width="1" stroke-dasharray="2,2" opacity="0.8" />
+    <line x1="0" y1="0" x2="0" y2="20" stroke="#D4A847" stroke-width="1.2" stroke-dasharray="2,2" opacity="0.8" />
+    
+    <!-- Central Node -->
+    <circle cx="0" cy="0" r="4.5" fill="#141C25" stroke="#D4A847" stroke-width="1.5" />
+    <circle cx="0" cy="0" r="1.5" fill="#FFFFFF" />
+  </g>
+
+  <!-- Verification Checkmark (Gold/Yellow) -->
+  <!-- Sweeps across from the school center and kicks up to verify existence -->
+  <!-- Checkmark Outline for separation -->
+  <path d="M 40 48 L 48 56 L 68 30" 
+        fill="none" 
+        stroke="#141C25" 
+        stroke-width="9.5" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+
+  <!-- Actual Checkmark -->
+  <path d="M 40 48 L 48 56 L 68 30" 
+        fill="none" 
+        stroke="#D4A847" 
+        stroke-width="5.5" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+</svg>
