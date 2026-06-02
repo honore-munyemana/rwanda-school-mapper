@@ -7,7 +7,19 @@ const router = express.Router();
 
 router.post("/", authMiddleware, roleMiddleware("admin", "mapper"), async (req, res) => {
   try {
-    const { name, district, latitude, longitude, has_internet, has_smart_classroom, has_playground, has_electricity } = req.body;
+    const { name, district, latitude, longitude, has_internet, has_smart_classroom, has_playground, has_electricity, school_type, education_level } = req.body;
+
+    // Validate school_type
+    const validSchoolTypes = ["Public", "Private", "Government Aided"];
+    if (!school_type || !validSchoolTypes.includes(school_type)) {
+      return res.status(400).json({ error: "Invalid school type" });
+    }
+
+    // Validate education_level
+    const validEducationLevels = ["Primary", "Secondary", "TVET", "Combined"];
+    if (!education_level || !validEducationLevels.includes(education_level)) {
+      return res.status(400).json({ error: "Invalid education level" });
+    }
 
     const net = !!has_internet;
     const smart = !!has_smart_classroom;
@@ -16,12 +28,12 @@ router.post("/", authMiddleware, roleMiddleware("admin", "mapper"), async (req, 
     const smart_score = (net ? 1 : 0) + (smart ? 1 : 0) + (play ? 1 : 0) + (elec ? 1 : 0);
 
     const query = `
-      INSERT INTO schools (name, district, location, has_internet, has_smart_classroom, has_playground, has_electricity, smart_score)
-      VALUES ($1, $2, ST_SetSRID(ST_MakePoint($3, $4), 4326), $5, $6, $7, $8, $9)
+      INSERT INTO schools (name, district, location, has_internet, has_smart_classroom, has_playground, has_electricity, smart_score, school_type, education_level)
+      VALUES ($1, $2, ST_SetSRID(ST_MakePoint($3, $4), 4326), $5, $6, $7, $8, $9, $10, $11)
       RETURNING *;
     `;
 
-    const values = [name, district, longitude, latitude, net, smart, play, elec, smart_score];
+    const values = [name, district, longitude, latitude, net, smart, play, elec, smart_score, school_type, education_level];
 
     const result = await pool.query(query, values);
 

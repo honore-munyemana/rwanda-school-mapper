@@ -143,6 +143,8 @@ router.get("/schools/:id", async (req, res) => {
         has_playground,
         has_electricity,
         smart_score,
+        school_type,
+        education_level,
         ST_Y(location::geometry) AS latitude,
         ST_X(location::geometry) AS longitude
       FROM schools
@@ -165,6 +167,8 @@ router.get("/schools/:id", async (req, res) => {
       has_playground: school.has_playground,
       has_electricity: school.has_electricity,
       smart_score: school.smart_score,
+      school_type: school.school_type,
+      education_level: school.education_level,
       latitude: school.latitude !== null ? parseFloat(school.latitude) : null,
       longitude: school.longitude !== null ? parseFloat(school.longitude) : null,
     });

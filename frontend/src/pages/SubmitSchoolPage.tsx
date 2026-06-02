@@ -11,6 +11,8 @@ import { toast } from "sonner";
 const initialForm = {
   name: "",
   district: "",
+  school_type: "",
+  education_level: "",
   latitude: "",
   longitude: "",
   has_internet: false,
@@ -62,6 +64,8 @@ export default function SubmitSchoolPage() {
   const validateForm = (): string | null => {
     if (!form.name.trim()) return "School name is required.";
     if (!form.district.trim()) return "District is required.";
+    if (!form.school_type) return "School type is required.";
+    if (!form.education_level) return "Education level is required.";
     if (!form.latitude || !form.longitude) return "Capture your location before submitting.";
     const latitude = Number(form.latitude);
     const longitude = Number(form.longitude);
@@ -102,6 +106,8 @@ export default function SubmitSchoolPage() {
         body: JSON.stringify({
           name: form.name.trim(),
           district: form.district.trim(),
+          school_type: form.school_type,
+          education_level: form.education_level,
           latitude: lat,
           longitude: lng,
           has_internet: form.has_internet,
@@ -194,6 +200,63 @@ export default function SubmitSchoolPage() {
                   className="bg-[#0F1923] border-white/10 text-[#EEE8DC] font-mono text-sm placeholder:text-[#8A9BAD]/50"
                   required
                 />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="school_type" className="font-mono text-xs uppercase tracking-widest text-[#8A9BAD]">
+                    School Type <span className="text-[#C4622D]">*</span>
+                  </Label>
+                  <select
+                    id="school_type"
+                    value={form.school_type}
+                    onChange={(e) => setForm((prev) => ({ ...prev, school_type: e.target.value }))}
+                    className="flex h-10 w-full rounded-md border border-white/10 bg-[#0F1923] px-3 py-2 text-sm font-mono text-[#EEE8DC] ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[#8A9BAD]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C4622D] focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
+                    required
+                  >
+                    <option value="" className="bg-[#0F1923] text-[#8A9BAD]">
+                      Select School Type
+                    </option>
+                    <option value="Public" className="bg-[#0F1923] text-[#EEE8DC]">
+                      Public
+                    </option>
+                    <option value="Private" className="bg-[#0F1923] text-[#EEE8DC]">
+                      Private
+                    </option>
+                    <option value="Government Aided" className="bg-[#0F1923] text-[#EEE8DC]">
+                      Government Aided
+                    </option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="education_level" className="font-mono text-xs uppercase tracking-widest text-[#8A9BAD]">
+                    Education Level <span className="text-[#C4622D]">*</span>
+                  </Label>
+                  <select
+                    id="education_level"
+                    value={form.education_level}
+                    onChange={(e) => setForm((prev) => ({ ...prev, education_level: e.target.value }))}
+                    className="flex h-10 w-full rounded-md border border-white/10 bg-[#0F1923] px-3 py-2 text-sm font-mono text-[#EEE8DC] ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-[#8A9BAD]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C4622D] focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
+                    required
+                  >
+                    <option value="" className="bg-[#0F1923] text-[#8A9BAD]">
+                      Select Education Level
+                    </option>
+                    <option value="Primary" className="bg-[#0F1923] text-[#EEE8DC]">
+                      Primary
+                    </option>
+                    <option value="Secondary" className="bg-[#0F1923] text-[#EEE8DC]">
+                      Secondary
+                    </option>
+                    <option value="TVET" className="bg-[#0F1923] text-[#EEE8DC]">
+                      TVET
+                    </option>
+                    <option value="Combined" className="bg-[#0F1923] text-[#EEE8DC]">
+                      Combined
+                    </option>
+                  </select>
+                </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
