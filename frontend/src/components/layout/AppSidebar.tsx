@@ -29,12 +29,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 
-const mainNavItems = [
-  {
-    title: 'Command Center',
-    href: '/',
-    icon: LayoutDashboard,
-  },
+const sharedNavItems = [
   {
     title: 'Geo-Intelligence',
     href: '/map',
@@ -45,6 +40,9 @@ const mainNavItems = [
     href: '/schools',
     icon: School,
   },
+];
+
+const validatorNavItems = [
   {
     title: 'Verification Queue',
     href: '/verification',
@@ -84,13 +82,33 @@ const adminNavItems = [
   },
 ];
 
+function getCommandCenterPath(role: string | undefined): string {
+  if (role === 'admin') return '/admin';
+  if (role === 'validator') return '/validator';
+  if (role === 'mapper') return '/mapper';
+  return '/map';
+}
+
 export function AppSidebar() {
   const { user } = useAuth();
   const location = useLocation();
   const currentPath = location.pathname;
   const isAdmin = user?.role === 'admin';
+  const isValidator = user?.role === 'validator';
+
+  const mainNavItems = [
+    {
+      title: 'Command Center',
+      href: getCommandCenterPath(user?.role),
+      icon: LayoutDashboard,
+    },
+    ...sharedNavItems,
+  ];
 
   const isActive = (path: string) => {
+    if (path === '/admin' || path === '/validator' || path === '/mapper') {
+      return currentPath === path || currentPath.startsWith(`${path}/`);
+    }
     if (path === '/') return currentPath === '/';
     return currentPath.startsWith(path);
   };
@@ -124,7 +142,7 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {mainNavItems.map((item) => (
+              {[...mainNavItems, ...(isValidator ? validatorNavItems : [])].map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     asChild
@@ -146,11 +164,11 @@ export function AppSidebar() {
                       <span className="flex-1 font-label text-sm tracking-wide lowercase italic group-hover:not-italic group-hover:uppercase group-hover:text-[10px] group-hover:font-black group-hover:tracking-widest transition-all">
                         {item.title}
                       </span>
-                      {item.badge && (
+                      {'badge' in item && item.badge ? (
                         <span className="flex h-5 min-w-5 items-center justify-center rounded-lg bg-[#C4622D] text-[9px] font-black text-white px-1.5 shadow-lg shadow-[#C4622D]/20">
                           {item.badge}
                         </span>
-                      )}
+                      ) : null}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

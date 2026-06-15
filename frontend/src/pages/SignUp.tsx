@@ -1,3 +1,4 @@
+/** @deprecated Legacy localStorage registration — routes redirect to /login. Retained for reference only. */
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

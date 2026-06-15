@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { Layers, Map as MapIcon, Satellite, Flame, Navigation, Loader2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 // Fix Leaflet default icon issue
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -33,33 +34,6 @@ const statusColors: Record<string, string> = {
   Pending: '#D4A847',
   Unverified: '#8A9BAD',
   Rejected: '#ef4444',
-};
-
-const normalizeBackendSchool = (
-  props: Record<string, unknown>,
-  latlng: L.LatLng
-): School => {
-  const rawStatus = String(props.status ?? 'Unverified');
-  const verificationStatus: School['verificationStatus'] =
-    rawStatus === 'Verified' || rawStatus === 'Pending' || rawStatus === 'Rejected' || rawStatus === 'Unverified'
-      ? rawStatus
-      : 'Unverified';
-
-  return {
-    id: String(props.id ?? 'unknown'),
-    name: String(props.name || 'Unknown School'),
-    province: String(props.province || 'N/A'),
-    district: String(props.district || 'Unknown District'),
-    sector: String(props.sector || 'N/A'),
-    coordinates: { lat: latlng.lat, lng: latlng.lng },
-    schoolType: (props.schoolType as School['schoolType']) || 'Public',
-    educationLevel: (props.educationLevel as School['educationLevel']) || 'Primary',
-    verificationStatus,
-    dateAdded: String(props.dateAdded || new Date().toISOString().split('T')[0]),
-    lastUpdated: String(props.lastUpdated || new Date().toISOString().split('T')[0]),
-    studentCount: Number(props.students ?? props.studentCount ?? 0) || undefined,
-    teacherCount: props.teacherCount != null ? Number(props.teacherCount) : undefined,
-  };
 };
 
 const createCustomIcon = (status: string) => {
@@ -98,14 +72,17 @@ const createCustomIcon = (status: string) => {
   });
 };
 
+const API_BASE = 'http://localhost:5000';
+
 export function SchoolMap({ schools, onSchoolSelect, height = '500px' }: SchoolMapProps) {
+  const { user, token } = useAuth();
+  const canVerify = user?.role === 'validator';
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.MarkerClusterGroup | null>(null);
   const [mapType, setMapType] = useState<'streets' | 'satellite'>('streets');
   const [showHeatmap, setShowHeatmap] = useState(false);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
-  const [backendSchools, setBackendSchools] = useState<any>(null);
   const [selectedSchoolForVerification, setSelectedSchoolForVerification] = useState<any>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -172,21 +149,6 @@ export function SchoolMap({ schools, onSchoolSelect, height = '500px' }: SchoolM
     };
   }, []);
 
-  // Fetch backend schools GeoJSON
-  useEffect(() => {
-    const fetchBackendSchools = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/schools');
-        if (!response.ok) throw new Error('Network response was not ok');
-        const data = await response.json();
-        setBackendSchools(data);
-      } catch (error) {
-        console.error('Error fetching backend schools:', error);
-      }
-    };
-    fetchBackendSchools();
-  }, []);
-
   // Handle Map Type change
   useEffect(() => {
     if (!mapRef.current || !tileLayerRef.current) return;
@@ -231,47 +193,16 @@ export function SchoolMap({ schools, onSchoolSelect, height = '500px' }: SchoolM
       });
       markersRef.current?.addLayer(marker);
     });
-
-    // Add backend GeoJSON schools if they exist
-    if (backendSchools && backendSchools.features) {
-      const geoJsonLayer = L.geoJSON(backendSchools, {
-        pointToLayer: (feature, latlng) => {
-          const props = feature?.properties || {};
-          const marker = L.marker(latlng, {
-            icon: createCustomIcon('Verified'), // default to Verified or map from feature properties
-          });
-          
-          marker.bindPopup(`
-            <div>
-              <strong>${props.name || "Unknown School"}</strong><br/>
-              District: ${props.district || "Unknown District"}<br/>
-              Lat: ${latlng.lat?.toFixed(6)}<br/>
-              Lng: ${latlng.lng?.toFixed(6)}
-            </div>
-          `, {
-            closeButton: false,
-          });
-          
-          marker.on('click', () => {
-            const normalized = normalizeBackendSchool(props, latlng);
-            onSchoolSelect?.(normalized);
-            setSelectedSchoolForVerification({
-              id: normalized.id,
-              name: normalized.name,
-              district: normalized.district,
-              status: normalized.verificationStatus,
-            });
-          });
-          
-          return marker;
-        }
-      });
-      markersRef.current.addLayer(geoJsonLayer);
-    }
-  }, [schools, onSchoolSelect, backendSchools]);
+  }, [schools, onSchoolSelect]);
 
   const handleVerifyGPS = () => {
     if (!selectedSchoolForVerification) return;
+
+    if (!token) {
+      toast.error('Authentication required. Please sign in again.');
+      return;
+    }
+
     setIsVerifying(true);
 
     if (!navigator.geolocation) {
@@ -283,24 +214,29 @@ export function SchoolMap({ schools, onSchoolSelect, height = '500px' }: SchoolM
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         try {
-          const response = await fetch('http://localhost:5000/verify', {
+          const response = await fetch(`${API_BASE}/verify`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
-              school_id: parseInt(selectedSchoolForVerification.id) || selectedSchoolForVerification.properties?.id,
+              school_id: parseInt(selectedSchoolForVerification.id, 10),
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
               notes: 'Verified via GPS by field officer',
             }),
           });
 
-          const data = await response.json();
+          const data = await response.json().catch(() => ({}));
 
           if (response.ok) {
-            toast.success('School verified successfully');
+            toast.success(data.message || 'School verified successfully');
             setSelectedSchoolForVerification((prev: any) => ({ ...prev, status: 'Verified' }));
           } else {
-            toast.error(data.error || 'Too far from school to verify');
+            toast.error(
+              typeof data.error === 'string' ? data.error : 'Too far from school to verify'
+            );
           }
         } catch (error) {
           toast.error('Failed to verify school');
@@ -430,21 +366,23 @@ export function SchoolMap({ schools, onSchoolSelect, height = '500px' }: SchoolM
             </span>
           </div>
 
-          <Button 
-            className={cn(
-              "w-full h-9 text-white text-[11px] font-bold uppercase tracking-wider transition-all",
-              selectedSchoolForVerification.status === 'Verified' ? "bg-white/10 hover:bg-white/10 opacity-50 cursor-not-allowed" : "bg-[#C4622D] hover:bg-[#C4622D]/80"
-            )}
-            onClick={handleVerifyGPS}
-            disabled={isVerifying || selectedSchoolForVerification.status === 'Verified'}
-          >
-            {isVerifying ? (
-              <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
-            ) : (
-              <Navigation className="w-3.5 h-3.5 mr-2" />
-            )}
-            {selectedSchoolForVerification.status === 'Verified' ? 'Verified' : 'Verify via GPS'}
-          </Button>
+          {canVerify ? (
+            <Button 
+              className={cn(
+                "w-full h-9 text-white text-[11px] font-bold uppercase tracking-wider transition-all",
+                selectedSchoolForVerification.status === 'Verified' ? "bg-white/10 hover:bg-white/10 opacity-50 cursor-not-allowed" : "bg-[#C4622D] hover:bg-[#C4622D]/80"
+              )}
+              onClick={handleVerifyGPS}
+              disabled={isVerifying || selectedSchoolForVerification.status === 'Verified'}
+            >
+              {isVerifying ? (
+                <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+              ) : (
+                <Navigation className="w-3.5 h-3.5 mr-2" />
+              )}
+              {selectedSchoolForVerification.status === 'Verified' ? 'Verified' : 'Verify via GPS'}
+            </Button>
+          ) : null}
         </div>
       )}
     </div>

@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { SchoolMap } from '@/components/map/SchoolMap';
-import { rwandaDistricts, rwandaProvinces, School } from '@/data/rwandaSchools';
+import { School } from '@/data/rwandaSchools';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -13,13 +13,14 @@ import {
 } from '@/components/ui/select';
 import { Filter, X, MapPin, School as SchoolIcon, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useData } from '@/context/DataContext';
+import { useBackendSchools } from '@/hooks/useBackendSchools';
+import { Loader2 } from 'lucide-react';
 
 type VerificationStatus = 'All' | 'Verified' | 'Pending' | 'Unverified' | 'Rejected';
 type SchoolType = 'All' | 'Public' | 'Private';
 
 export default function MapView() {
-  const { schools } = useData();
+  const { schools, loading } = useBackendSchools();
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
   const [statusFilter, setStatusFilter] = useState<VerificationStatus>('All');
   const [districtFilter, setDistrictFilter] = useState<string>('All');
@@ -34,7 +35,10 @@ export default function MapView() {
     return true;
   });
 
-  const allDistricts = Object.values(rwandaDistricts).flat().sort();
+  const allDistricts = useMemo(
+    () => [...new Set(schools.map((s) => s.district).filter(Boolean))].sort(),
+    [schools]
+  );
 
   const clearFilters = () => {
     setStatusFilter('All');
@@ -54,7 +58,7 @@ export default function MapView() {
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Map View</h1>
               <p className="text-muted-foreground">
-                {filteredSchools.length} schools displayed
+                {loading ? 'Loading schools…' : `${filteredSchools.length} schools displayed`}
               </p>
             </div>
           </div>
@@ -123,12 +127,18 @@ export default function MapView() {
         {/* Map Container */}
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4">
           {/* Main Map */}
-          <div className="lg:col-span-3">
-            <SchoolMap
-              schools={filteredSchools}
-              onSchoolSelect={setSelectedSchool}
-              height="520px"
-            />
+          <div className="lg:col-span-3 relative">
+            {loading ? (
+              <div className="flex h-[520px] items-center justify-center rounded-xl border border-white/5 bg-[#0F1923]">
+                <Loader2 className="h-8 w-8 animate-spin text-[#C4622D]" />
+              </div>
+            ) : (
+              <SchoolMap
+                schools={filteredSchools}
+                onSchoolSelect={setSelectedSchool}
+                height="520px"
+              />
+            )}
           </div>
 
           {/* Side Panel */}

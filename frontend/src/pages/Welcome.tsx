@@ -1,19 +1,25 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { getAuthState, getDashboardPathForRole } from '@/routes/auth';
+import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
 import { Globe } from 'lucide-react';
 
+function getDashboardPathForJwtRole(role: string): string {
+  if (role === 'admin') return '/admin';
+  if (role === 'validator') return '/validator';
+  if (role === 'mapper') return '/mapper';
+  return '/map';
+}
+
 export default function Welcome() {
   const navigate = useNavigate();
+  const { isAuthenticated, user, loading } = useAuth();
 
   useEffect(() => {
-    const auth = getAuthState();
-    if (auth?.isAuthenticated) {
-      navigate(getDashboardPathForRole(auth.role));
-    }
-  }, [navigate]);
+    if (loading || !isAuthenticated || !user) return;
+    navigate(getDashboardPathForJwtRole(user.role));
+  }, [navigate, isAuthenticated, user, loading]);
 
   return (
     <div className="relative min-h-screen w-full bg-[#0F1923] overflow-hidden flex flex-col font-sans text-[#EEE8DC]">
@@ -45,13 +51,13 @@ export default function Welcome() {
             <Button
               variant="ghost"
               className="font-label text-sm uppercase tracking-widest hover:text-[#C4622D] hover:bg-white/5"
-              onClick={() => navigate('/signin')}
+              onClick={() => navigate('/login')}
             >
               Access System
             </Button>
             <Button
               className="bg-[#C4622D] hover:bg-[#A85225] text-white font-label text-sm uppercase tracking-widest px-6"
-              onClick={() => navigate('/signup')}
+              onClick={() => navigate('/login')}
             >
               Register Unit
             </Button>
@@ -88,7 +94,7 @@ export default function Welcome() {
             <Button
               size="lg"
               className="bg-[#C4622D] hover:bg-[#A85225] text-white font-label h-14 px-10 rounded-xl shadow-lg ring-1 ring-[#C4622D]/50 transition-all hover:scale-[1.02]"
-              onClick={() => navigate('/signin')}
+              onClick={() => navigate('/login')}
             >
               Launch Dashboard
             </Button>
@@ -123,7 +129,7 @@ export default function Welcome() {
       <footer className="relative z-10 py-8 px-6 border-t border-white/5 bg-[#0F1923]">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-[10px] font-mono text-[#8A9BAD] uppercase tracking-widest">
-            Ministry of Education • GIS Logistics Division • Proto v4.1
+            Ministry of Education • GIS Logistics Division • v4.1
           </p>
           <div className="flex gap-4 opacity-50 grayscale hover:grayscale-0 transition-all">
             {/* Logo placeholders or small icons */}

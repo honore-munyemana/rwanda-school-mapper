@@ -502,13 +502,13 @@ export default function VerifierDashboard() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-white/5 hover:bg-transparent">
-                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">School Name</TableHead>
-                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">District</TableHead>
-                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD] hidden md:table-cell">School Type</TableHead>
-                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD] hidden lg:table-cell">Education Level</TableHead>
-                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">Status</TableHead>
-                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD] hidden sm:table-cell">Smart Score</TableHead>
-                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">Action</TableHead>
+                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">School Name</TableHead>
+                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">District</TableHead>
+                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90 hidden md:table-cell">School Type</TableHead>
+                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90 hidden lg:table-cell">Education Level</TableHead>
+                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">Status</TableHead>
+                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90 hidden sm:table-cell">Smart Score</TableHead>
+                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -707,10 +707,10 @@ export default function VerifierDashboard() {
             <Table>
               <TableHeader>
                 <TableRow className="border-white/5 hover:bg-transparent">
-                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">School</TableHead>
-                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">Validator</TableHead>
-                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">Result</TableHead>
-                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">Timestamp</TableHead>
+                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">School</TableHead>
+                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">Validator</TableHead>
+                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">Result</TableHead>
+                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">Timestamp</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

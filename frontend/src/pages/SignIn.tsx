@@ -1,3 +1,4 @@
+/** @deprecated Legacy localStorage auth — routes redirect to /login. Retained for reference only. */
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';

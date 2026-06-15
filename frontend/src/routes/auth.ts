@@ -1,3 +1,4 @@
+/** Legacy localStorage auth helpers — used by deprecated SignIn/SignUp and UserManagement prototype. */
 export type AuthRole = 'Admin' | 'Verifier' | 'Public User';
 
 export interface StoredUser {
@@ -23,8 +24,8 @@ const AUTH_KEY = 'ssevms_auth';
 
 export function getDashboardPathForRole(role: AuthRole) {
   if (role === 'Admin') return '/admin';
-  if (role === 'Verifier') return '/verifier';
-  return '/public';
+  if (role === 'Verifier') return '/validator';
+  return '/mapper';
 }
 
 export function getAllUsers(): StoredUser[] {

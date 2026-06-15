@@ -19,16 +19,19 @@ import {
   MapPin, 
   ExternalLink,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
+  ShieldAlert,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useData } from '@/context/DataContext';
-import { useUser } from '@/context/UserContext';
+import { useAuth } from '@/context/AuthContext';
+import { Link } from 'react-router-dom';
 
 export default function VerificationQueue() {
+  const { user } = useAuth();
   const { schools, updateSchool, addVerificationHistory } = useData();
-  const { currentUser } = useUser();
+  const performerId = user?.id != null ? String(user.id) : 'validator';
   const [activeTab, setActiveTab] = useState('pending');
   const [rejectionReason, setRejectionReason] = useState('');
 
@@ -40,7 +43,7 @@ export default function VerificationQueue() {
   const handleApprove = (school: School) => {
     updateSchool(school.id, {
       verificationStatus: 'Verified',
-      verifiedBy: currentUser?.id ?? 'validator_001',
+      verifiedBy: performerId,
       lastUpdated: new Date().toISOString().slice(0, 10),
     });
     addVerificationHistory({
@@ -48,9 +51,9 @@ export default function VerificationQueue() {
       action: 'Verified',
       previousStatus: school.verificationStatus,
       newStatus: 'Verified',
-      performedBy: currentUser?.id ?? 'validator_001',
+      performedBy: performerId,
       timestamp: new Date().toISOString(),
-      notes: 'Verified via queue (prototype).',
+      notes: 'Verified via legacy verification queue.',
     });
     toast.success(`${school.name} has been verified!`);
   };
@@ -70,7 +73,7 @@ export default function VerificationQueue() {
       action: 'Rejected',
       previousStatus: school.verificationStatus,
       newStatus: 'Rejected',
-      performedBy: currentUser?.id ?? 'validator_001',
+      performedBy: performerId,
       timestamp: new Date().toISOString(),
       notes: rejectionReason,
     });
@@ -179,14 +182,44 @@ export default function VerificationQueue() {
     </Card>
   );
 
+  if (user?.role !== 'validator') {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
+          <ShieldAlert className="h-12 w-12 text-[#C4622D]" />
+          <h1 className="text-xl font-display font-bold text-white uppercase tracking-wider">
+            Access Restricted
+          </h1>
+          <p className="font-mono text-xs text-[#8A9BAD] uppercase tracking-widest max-w-md">
+            The verification queue is available to validator personnel only. Use your role dashboard for permitted operations.
+          </p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        <div className="rounded-xl border border-[#D4A847]/30 bg-[#D4A847]/10 p-4 flex gap-3 items-start">
+          <AlertTriangle className="h-5 w-5 text-[#D4A847] flex-shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-[#EEE8DC]">Legacy verification queue</p>
+            <p className="text-xs text-[#8A9BAD]">
+              This page uses local seed data only. For live GPS verification and audit activity, use the{' '}
+              <Link to="/validator" className="text-[#C4622D] hover:underline font-semibold">
+                Validator Dashboard
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Verification Queue</h1>
           <p className="text-muted-foreground">
-            Review and validate school submissions
+            Review and validate school submissions (local data)
           </p>
         </div>
 

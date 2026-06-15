@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { StatsCard } from '@/components/dashboard/StatsCard';
-import { VerificationChart } from '@/components/dashboard/VerificationChart';
 import { DistrictChart } from '@/components/dashboard/DistrictChart';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +19,7 @@ import { cn } from '@/lib/utils';
 import {
   School,
   CheckCircle,
-  AlertCircle,
+  MapPin,
   GraduationCap,
   Shield,
   Download,
@@ -213,14 +212,14 @@ export default function AdminDashboard() {
         <div className="space-y-2">
           <div className="flex items-center gap-3">
             <Shield className="h-5 w-5 text-[#D4A847]" />
-            <span className="font-mono text-[10px] font-black uppercase tracking-[0.4em] text-[#8A9BAD]/60">
+            <span className="font-mono text-[10px] font-black uppercase tracking-[0.4em] text-[#D4A847]/90/60">
               National Command Center
             </span>
           </div>
           <h1 className="text-3xl md:text-4xl font-display font-bold tracking-tight text-white uppercase italic">
             Admin <span className="text-[#D4A847]">Dashboard</span>
           </h1>
-          <p className="font-mono text-xs text-[#8A9BAD] uppercase tracking-widest">
+          <p className="font-mono text-xs text-[#D4A847]/90 uppercase tracking-widest">
             SSEVMS — {user?.name ?? 'Administrator'} • Live national intelligence
           </p>
         </div>
@@ -238,15 +237,15 @@ export default function AdminDashboard() {
         <StatsCard
           title="Verified Schools"
           value={activeOverview.verifiedSchools}
-          description="Verification complete"
+          description="Validated records"
           icon={<CheckCircle className="h-5 w-5" />}
           variant="success"
         />
         <StatsCard
-          title="Unverified Schools"
-          value={activeOverview.unverifiedSchools}
-          description="Awaiting field validation"
-          icon={<AlertCircle className="h-5 w-5" />}
+          title="Districts Covered"
+          value={Object.keys(districts).length}
+          description="Active districts"
+          icon={<MapPin className="h-5 w-5" />}
           variant="warning"
         />
         <StatsCard
@@ -258,35 +257,19 @@ export default function AdminDashboard() {
         />
       </div>
 
-      {/* Section 2 — Analytics Visualization */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="bg-[#141C25]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-6 md:p-8 shadow-xl">
-          <h3 className="text-[10px] font-black uppercase tracking-widest text-[#C4622D] mb-6 flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Verification Status Distribution
-          </h3>
-          <VerificationChart
-            data={{
-              verified: activeOverview.verifiedSchools,
-              pending: activeOverview.pendingSchools,
-              unverified: activeOverview.unverifiedSchools,
-              rejected: activeOverview.rejectedSchools,
-            }}
-          />
-        </div>
-
-        <div className="bg-[#141C25]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-6 md:p-8 shadow-xl">
-          <h3 className="text-[10px] font-black uppercase tracking-widest text-[#D4A847] mb-6">
-            District School Distribution
-          </h3>
-          {Object.keys(districts).length > 0 ? (
-            <DistrictChart data={districts} />
-          ) : (
-            <div className="flex items-center justify-center h-[280px] text-[#8A9BAD] font-mono text-xs uppercase tracking-widest">
-              No district data available
-            </div>
-          )}
-        </div>
+      {/* Section 2 — District Analytics */}
+      <div className="bg-[#141C25]/60 backdrop-blur-xl rounded-2xl border border-white/5 p-6 md:p-8 shadow-xl">
+        <h3 className="text-[10px] font-black uppercase tracking-widest text-[#D4A847] mb-6 flex items-center gap-2">
+          <BarChart3 className="h-4 w-4" />
+          District School Distribution
+        </h3>
+        {Object.keys(districts).length > 0 ? (
+          <DistrictChart data={districts} />
+        ) : (
+          <div className="flex items-center justify-center h-[280px] text-[#D4A847]/90 font-mono text-xs uppercase tracking-widest">
+            No district data available
+          </div>
+        )}
       </div>
 
       {/* Sections 3 & 4 — Audit Activity + Quick Actions */}
@@ -299,8 +282,8 @@ export default function AdminDashboard() {
                 <History className="h-5 w-5 text-[#C4622D]" />
                 Recent Audit Activity
               </h3>
-              <p className="font-mono text-[10px] text-[#8A9BAD] uppercase tracking-widest mt-1">
-                Latest verification events
+              <p className="font-mono text-[10px] text-[#D4A847]/90 uppercase tracking-widest mt-1">
+                Latest system audit events
               </p>
             </div>
             <Button variant="ghost" asChild className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847] hover:text-white">
@@ -314,8 +297,8 @@ export default function AdminDashboard() {
             </div>
           ) : recentAudit.length === 0 ? (
             <div className="py-12 text-center">
-              <p className="font-mono text-xs text-[#8A9BAD] uppercase tracking-widest">
-                No verification events recorded yet
+              <p className="font-mono text-xs text-[#D4A847]/90 uppercase tracking-widest">
+                No audit events recorded yet
               </p>
             </div>
           ) : (
@@ -323,16 +306,16 @@ export default function AdminDashboard() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-white/5 hover:bg-transparent">
-                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">
+                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">
                       School Name
                     </TableHead>
-                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">
+                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">
                       Validator Name
                     </TableHead>
-                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">
+                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">
                       Result
                     </TableHead>
-                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">
+                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">
                       Timestamp
                     </TableHead>
                   </TableRow>
@@ -343,7 +326,7 @@ export default function AdminDashboard() {
                       <TableCell className="font-medium text-[#EEE8DC]">
                         {log.school_name || 'Unknown School'}
                       </TableCell>
-                      <TableCell className="font-mono text-xs text-[#8A9BAD]">
+                      <TableCell className="font-mono text-xs text-[#D4A847]/90">
                         {log.verifier_email || 'N/A'}
                       </TableCell>
                       <TableCell>
@@ -351,13 +334,13 @@ export default function AdminDashboard() {
                           variant="outline"
                           className={cn(
                             'text-[10px] px-2 py-0 h-5 font-bold uppercase tracking-wider',
-                            resultStyles[log.result] ?? 'bg-white/5 text-[#8A9BAD] border-white/10'
+                            resultStyles[log.result] ?? 'bg-white/5 text-[#D4A847]/90 border-white/10'
                           )}
                         >
                           {log.result}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-mono text-xs text-[#8A9BAD]">
+                      <TableCell className="font-mono text-xs text-[#D4A847]/90">
                         {formatDate(log.created_at)}
                       </TableCell>
                     </TableRow>
@@ -375,7 +358,7 @@ export default function AdminDashboard() {
               <FileText className="h-5 w-5 text-[#D4A847]" />
               Admin Actions
             </h3>
-            <p className="font-mono text-[10px] text-[#8A9BAD] uppercase tracking-widest">
+            <p className="font-mono text-[10px] text-[#D4A847]/90 uppercase tracking-widest">
               PDF reports & governance shortcuts
             </p>
 
@@ -425,7 +408,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="bg-[#141C25]/60 rounded-xl border border-white/5 p-6 space-y-2">
-            <p className="font-mono text-[10px] text-[#8A9BAD] uppercase tracking-widest mb-3">
+            <p className="font-mono text-[10px] text-[#D4A847]/90 uppercase tracking-widest mb-3">
               Navigation
             </p>
             <Button
@@ -454,7 +437,7 @@ export default function AdminDashboard() {
               className="w-full h-10 border-white/10 hover:bg-white/5 text-[#EEE8DC] font-mono text-[10px] uppercase tracking-widest gap-2 justify-start"
             >
               <Link to="/settings">
-                <Settings className="h-4 w-4 text-[#8A9BAD]" />
+                <Settings className="h-4 w-4 text-[#D4A847]/90" />
                 System Settings
               </Link>
             </Button>

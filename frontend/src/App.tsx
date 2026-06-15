@@ -2,15 +2,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import Welcome from "./pages/Welcome";
-import SignIn from "./pages/SignIn";
-import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
-import AdminDashboard from "./pages/dashboards/AdminDashboard";
-import VerifierDashboard from "./pages/dashboards/VerifierDashboard";
-import PublicDashboard from "./pages/dashboards/PublicDashboard";
 import AdminPage from "./pages/AdminPage";
 import ValidatorPage from "./pages/ValidatorPage";
 import MapperPage from "./pages/MapperPage";
@@ -42,8 +37,8 @@ const App = () => (
         <Routes>
           {/* Welcome / auth */}
           <Route path="/" element={<Welcome />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
+          <Route path="/signin" element={<Navigate to="/login" replace />} />
+          <Route path="/signup" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
 
           {/* Protected Routes - Accessible by authenticated users with appropriate roles */}
@@ -55,9 +50,6 @@ const App = () => (
             <Route path="/reports" element={<Reports />} />
             <Route path="/community" element={<CommunityEngagement />} />
             <Route path="/infrastructure" element={<InfrastructureAssessment />} />
-            {/* Some routes might be more restricted */}
-            <Route path="/verification" element={<VerificationQueue />} />
-            <Route path="/validation" element={<RemoteValidation />} />
             <Route path="/quality" element={<QualityAudit />} />
             <Route path="/integration" element={<DataIntegration />} />
           </Route>
@@ -73,6 +65,9 @@ const App = () => (
           {/* Validator Restricted */}
           <Route element={<ProtectedRoute roles={["validator"]} />}>
             <Route path="/validator" element={<ValidatorPage />} />
+            <Route path="/verification" element={<VerificationQueue />} />
+            <Route path="/validation" element={<RemoteValidation />} />
+            <Route path="/verifier" element={<Navigate to="/validator" replace />} />
           </Route>
 
           {/* Mapper Restricted */}
@@ -85,15 +80,7 @@ const App = () => (
             <Route path="/submit-school" element={<SubmitSchoolPage />} />
           </Route>
 
-          {/* Legacy Verifier Restricted */}
-          <Route element={<ProtectedRoute roles={["validator"]} />}>
-            <Route path="/verifier" element={<VerifierDashboard />} />
-          </Route>
-
-          {/* Legacy Public User Restricted */}
-          <Route element={<ProtectedRoute roles={["mapper"]} />}>
-            <Route path="/public" element={<PublicDashboard />} />
-          </Route>
+          <Route path="/public" element={<Navigate to="/mapper" replace />} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>

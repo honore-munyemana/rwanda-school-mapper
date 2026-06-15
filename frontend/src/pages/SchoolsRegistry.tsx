@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { rwandaDistricts, School } from '@/data/rwandaSchools';
+import { School } from '@/data/rwandaSchools';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -49,7 +49,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { useData } from '@/context/DataContext';
+import { useBackendSchools } from '@/hooks/useBackendSchools';
+import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 type VerificationStatus = 'All' | 'Verified' | 'Pending' | 'Unverified' | 'Rejected';
@@ -62,7 +63,7 @@ const statusStyles: Record<string, string> = {
 };
 
 export default function SchoolsRegistry() {
-  const { schools } = useData();
+  const { schools, loading } = useBackendSchools();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<VerificationStatus>('All');
   const [districtFilter, setDistrictFilter] = useState<string>('All');
@@ -82,7 +83,10 @@ export default function SchoolsRegistry() {
     return true;
   });
 
-  const allDistricts = Object.values(rwandaDistricts).flat().sort();
+  const allDistricts = useMemo(
+    () => [...new Set(schools.map((s) => s.district).filter(Boolean))].sort(),
+    [schools]
+  );
 
   const clearFilters = () => {
     setStatusFilter('All');
@@ -172,7 +176,7 @@ export default function SchoolsRegistry() {
               </Button>
             )}
             <div className="text-[10px] font-mono font-bold text-[#8A9BAD]/40 uppercase tracking-widest">
-              {filteredSchools.length} Match
+              {loading ? '…' : `${filteredSchools.length} Match`}
             </div>
           </div>
         </div>
@@ -187,18 +191,31 @@ export default function SchoolsRegistry() {
           <Table>
             <TableHeader className="bg-black/20 border-b border-white/5">
               <TableRow className="hover:bg-transparent border-none">
-                <TableHead className="font-label text-[10px] font-black uppercase text-[#8A9BAD] tracking-widest h-14 pl-8">Strategic Designation</TableHead>
-                <TableHead className="font-label text-[10px] font-black uppercase text-[#8A9BAD] tracking-widest h-14">Data ID</TableHead>
-                <TableHead className="font-label text-[10px] font-black uppercase text-[#8A9BAD] tracking-widest h-14">Vector Region</TableHead>
-                <TableHead className="font-label text-[10px] font-black uppercase text-[#8A9BAD] tracking-widest h-14">Classification</TableHead>
-                <TableHead className="font-label text-[10px] font-black uppercase text-[#8A9BAD] tracking-widest h-14">Tier</TableHead>
-                <TableHead className="font-label text-[10px] font-black uppercase text-[#8A9BAD] tracking-widest h-14">Integrity</TableHead>
-                <TableHead className="font-label text-[10px] font-black uppercase text-[#8A9BAD] tracking-widest h-14">Archive Log</TableHead>
+                <TableHead className="font-label text-[10px] font-black uppercase text-[#D4A847]/90 tracking-widest h-14 pl-8 bg-[#0F1923]/60">Strategic Designation</TableHead>
+                <TableHead className="font-label text-[10px] font-black uppercase text-[#D4A847]/90 tracking-widest h-14 bg-[#0F1923]/60">Data ID</TableHead>
+                <TableHead className="font-label text-[10px] font-black uppercase text-[#D4A847]/90 tracking-widest h-14 bg-[#0F1923]/60">Vector Region</TableHead>
+                <TableHead className="font-label text-[10px] font-black uppercase text-[#D4A847]/90 tracking-widest h-14 bg-[#0F1923]/60">Classification</TableHead>
+                <TableHead className="font-label text-[10px] font-black uppercase text-[#D4A847]/90 tracking-widest h-14 bg-[#0F1923]/60">Tier</TableHead>
+                <TableHead className="font-label text-[10px] font-black uppercase text-[#D4A847]/90 tracking-widest h-14 bg-[#0F1923]/60">Integrity</TableHead>
+                <TableHead className="font-label text-[10px] font-black uppercase text-[#D4A847]/90 tracking-widest h-14 bg-[#0F1923]/60">Archive Log</TableHead>
                 <TableHead className="w-[80px] h-14"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredSchools.map((school, index) => (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="h-48 text-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-[#C4622D] mx-auto" />
+                  </TableCell>
+                </TableRow>
+              ) : filteredSchools.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="h-32 text-center font-mono text-xs text-[#8A9BAD] uppercase tracking-widest">
+                    No schools match the current filters
+                  </TableCell>
+                </TableRow>
+              ) : null}
+              {!loading && filteredSchools.map((school, index) => (
                 <TableRow
                   key={school.id}
                   className={cn(

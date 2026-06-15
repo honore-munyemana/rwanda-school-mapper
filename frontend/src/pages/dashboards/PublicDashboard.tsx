@@ -1,3 +1,4 @@
+/** @deprecated Legacy mapper alias dashboard — /public redirects to /mapper. Retained for reference only. */
 import { DashboardShell } from '@/components/auth/DashboardShell';
 import { useData } from '@/context/DataContext';
 import { Input } from '@/components/ui/input';

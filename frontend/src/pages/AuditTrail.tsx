@@ -103,19 +103,19 @@ export default function AuditTrail() {
             <Table>
               <TableHeader>
                 <TableRow className="border-white/5 hover:bg-transparent">
-                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">
+                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">
                     School
                   </TableHead>
-                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">
+                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">
                     Verifier
                   </TableHead>
-                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">
+                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">
                     Result
                   </TableHead>
-                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">
+                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">
                     Distance
                   </TableHead>
-                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#8A9BAD]">
+                  <TableHead className="font-mono text-[10px] uppercase tracking-widest text-[#D4A847]/90">
                     Date
                   </TableHead>
                 </TableRow>

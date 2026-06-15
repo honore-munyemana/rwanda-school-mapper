@@ -6,6 +6,7 @@ import auditRoutes from "./routes/auditRoutes.js";
 import schoolHistoryRoutes from "./routes/schoolHistoryRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import pool from "./config/db.js";
 import { runMigrations } from "./migrations/runMigrations.js";
 import express from "express";
@@ -38,6 +39,7 @@ app.use("/audit", auditRoutes);
 app.use("/schools", schoolHistoryRoutes);
 app.use("/analytics", analyticsRoutes);
 app.use("/reports", reportRoutes);
+app.use("/users", userRoutes);
 
 runMigrations()
   .then(() => {

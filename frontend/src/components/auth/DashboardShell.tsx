@@ -1,3 +1,4 @@
+/** @deprecated Legacy shell for PublicDashboard — no longer routed. */
 import { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';

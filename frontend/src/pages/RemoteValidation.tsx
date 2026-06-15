@@ -38,6 +38,14 @@ export default function RemoteValidation() {
   return (
     <DashboardLayout>
       <div className="space-y-6 pb-10">
+        <div className="rounded-xl border border-[#D4A847]/30 bg-[#D4A847]/10 p-4 flex gap-3 items-start">
+          <AlertCircle className="h-5 w-5 text-[#D4A847] flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-[#8A9BAD]">
+            <span className="text-sm font-semibold text-[#EEE8DC] block mb-1">Deprecated — static demo data</span>
+            Remote validation uses hardcoded sample records. Live verification is available on the Validator Dashboard.
+          </p>
+        </div>
+
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Remote Desktop Validation</h1>
