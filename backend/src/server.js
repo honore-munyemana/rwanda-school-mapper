@@ -7,10 +7,15 @@ import schoolHistoryRoutes from "./routes/schoolHistoryRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
 import pool from "./config/db.js";
 import { runMigrations } from "./migrations/runMigrations.js";
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
@@ -40,6 +45,8 @@ app.use("/schools", schoolHistoryRoutes);
 app.use("/analytics", analyticsRoutes);
 app.use("/reports", reportRoutes);
 app.use("/users", userRoutes);
+app.use("/profile", profileRoutes);
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 runMigrations()
   .then(() => {

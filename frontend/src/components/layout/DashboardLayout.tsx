@@ -69,7 +69,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       <span className="text-[9px] font-mono text-[#D4A847] uppercase tracking-widest mt-1">{(user?.email || 'System Root').split('@')[0]}</span>
                     </div>
                     <Avatar className="h-10 w-10 rounded-lg border border-[#C4622D]/20 ring-4 ring-black/40">
-                      <AvatarImage src="/placeholder.svg" alt="User" />
+                      <AvatarImage src={user?.profile_photo ? `http://localhost:5000/${user.profile_photo}` : undefined} alt="User" />
                       <AvatarFallback className="bg-[#141C25] text-[#C4622D] font-bold rounded-lg border border-white/5">
                         {(user?.name || 'AD').slice(0, 2).toUpperCase()}
                       </AvatarFallback>
@@ -90,13 +90,18 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-white/5" />
                   <DropdownMenuItem asChild className="focus:bg-white/5 cursor-pointer rounded-lg m-1">
-                    <Link to="/settings" className="text-xs font-label uppercase tracking-widest w-full text-center py-1 text-[#EEE8DC] hover:text-[#D4A847] transition-colors block">
-                      System Settings
+                    <Link to="/profile" state={{ activeTab: "overview" }} className="text-xs font-label uppercase tracking-widest w-full text-center py-1 text-[#EEE8DC] hover:text-[#D4A847] transition-colors block">
+                      View Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="focus:bg-white/5 cursor-pointer rounded-lg m-1">
+                    <Link to="/profile" state={{ activeTab: "edit" }} className="text-xs font-label uppercase tracking-widest w-full text-center py-1 text-[#EEE8DC] hover:text-[#D4A847] transition-colors block">
+                      Edit Profile
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-white/5" />
                   <DropdownMenuItem className="text-red-400 focus:bg-red-400/10 focus:text-red-400 cursor-pointer rounded-lg m-1" onClick={logout}>
-                    <p className="text-xs font-label uppercase tracking-widest w-full text-center py-1">Terminate Session</p>
+                    <p className="text-xs font-label uppercase tracking-widest w-full text-center py-1">Logout</p>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

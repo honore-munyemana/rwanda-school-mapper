@@ -5,6 +5,7 @@ interface User {
   name: string;
   email: string;
   role: string;
+  profile_photo?: string | null;
 }
 
 interface AuthContextType {
@@ -14,6 +15,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,6 +32,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setIsAuthenticated(false);
     setLoading(false);
+  };
+
+  const refreshUser = async () => {
+    const storedToken = localStorage.getItem("ssevms_token");
+    if (!storedToken) return;
+    try {
+      const res = await fetch("http://localhost:5000/auth/me", {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+      if (res.ok) {
+        const userData = await res.json();
+        setUser({
+          id: userData.id,
+          name: userData.name || userData.email.split("@")[0],
+          email: userData.email,
+          role: userData.role,
+          profile_photo: userData.profile_photo,
+        });
+      }
+    } catch (error) {
+      console.error("Error refreshing user in AuthContext:", error);
+    }
   };
 
   const login = async (email: string, password: string) => {
@@ -74,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             name: userData.name || userData.email.split("@")[0],
             email: userData.email,
             role: userData.role,
+            profile_photo: userData.profile_photo,
           });
           setIsAuthenticated(true);
         } else {
@@ -100,6 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         login,
         logout,
+        refreshUser,
       }}
     >
       {children}

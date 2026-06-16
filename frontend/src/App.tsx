@@ -24,6 +24,7 @@ import InfrastructureAssessment from "./pages/InfrastructureAssessment";
 import SystemSettings from "./pages/SystemSettings";
 import UserManagement from "./pages/UserManagement";
 import AuditTrail from "./pages/AuditTrail";
+import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="/quality" element={<QualityAudit />} />
             <Route path="/integration" element={<DataIntegration />} />
             <Route path="/settings" element={<SystemSettings />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
 
           {/* Admin Restricted */}

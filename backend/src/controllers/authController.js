@@ -74,7 +74,8 @@ export const login = async (req, res) => {
       user: {
         id: user.id,
         name: user.name,
-        role: user.role
+        role: user.role,
+        profile_photo: user.profile_photo
       }
     });
   } catch (error) {
@@ -85,12 +86,15 @@ export const login = async (req, res) => {
 
 export const getMe = async (req, res) => {
   try {
-    // req.user is attached by authMiddleware
-    res.json({
-      id: req.user.id,
-      email: req.user.email,
-      role: req.user.role
-    });
+    // req.user is attached by authMiddleware. Query the database to get fresh details
+    const result = await pool.query(
+      "SELECT id, name, email, role, profile_photo FROM users WHERE id = $1",
+      [req.user.id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json(result.rows[0]);
   } catch (error) {
     console.error("GetMe error:", error);
     res.status(500).json({ error: error.message });
