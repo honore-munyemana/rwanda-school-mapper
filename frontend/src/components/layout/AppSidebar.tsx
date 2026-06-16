@@ -40,6 +40,11 @@ const sharedNavItems = [
     href: '/schools',
     icon: School,
   },
+  {
+    title: 'Settings',
+    href: '/settings',
+    icon: Settings,
+  },
 ];
 
 const validatorNavItems = [
@@ -74,11 +79,6 @@ const adminNavItems = [
     title: 'Audit Trail',
     href: '/audit',
     icon: History,
-  },
-  {
-    title: 'System Config',
-    href: '/settings',
-    icon: Settings,
   },
 ];
 

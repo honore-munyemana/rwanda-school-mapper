@@ -42,6 +42,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
 
           {/* Protected Routes - Accessible by authenticated users with appropriate roles */}
+          {/* Protected Routes - Accessible by authenticated users with appropriate roles */}
           <Route element={<ProtectedRoute roles={["admin", "validator", "mapper"]} />}>
             <Route path="/map" element={<MapView />} />
             <Route path="/schools" element={<SchoolsRegistry />} />
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/infrastructure" element={<InfrastructureAssessment />} />
             <Route path="/quality" element={<QualityAudit />} />
             <Route path="/integration" element={<DataIntegration />} />
+            <Route path="/settings" element={<SystemSettings />} />
           </Route>
 
           {/* Admin Restricted */}
@@ -59,7 +61,6 @@ const App = () => (
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/audit" element={<AuditTrail />} />
-            <Route path="/settings" element={<SystemSettings />} />
           </Route>
 
           {/* Validator Restricted */}

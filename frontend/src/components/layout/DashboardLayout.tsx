@@ -1,4 +1,5 @@
 import { ReactNode, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AppSidebar } from './AppSidebar';
 import { SidebarProvider, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
 import { Bell, Search, User, Globe } from 'lucide-react';
@@ -87,6 +88,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       </p>
                     </div>
                   </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-white/5" />
+                  <DropdownMenuItem asChild className="focus:bg-white/5 cursor-pointer rounded-lg m-1">
+                    <Link to="/settings" className="text-xs font-label uppercase tracking-widest w-full text-center py-1 text-[#EEE8DC] hover:text-[#D4A847] transition-colors block">
+                      System Settings
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-white/5" />
                   <DropdownMenuItem className="text-red-400 focus:bg-red-400/10 focus:text-red-400 cursor-pointer rounded-lg m-1" onClick={logout}>
                     <p className="text-xs font-label uppercase tracking-widest w-full text-center py-1">Terminate Session</p>
