@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
+import ActivateAccount from "./pages/ActivateAccount";
+import ResendActivation from "./pages/ResendActivation";
 import AdminPage from "./pages/AdminPage";
 import ValidatorPage from "./pages/ValidatorPage";
 import MapperPage from "./pages/MapperPage";
@@ -41,6 +43,8 @@ const App = () => (
           <Route path="/signin" element={<Navigate to="/login" replace />} />
           <Route path="/signup" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/activate" element={<ActivateAccount />} />
+          <Route path="/resend-activation" element={<ResendActivation />} />
 
           {/* Protected Routes - Accessible by authenticated users with appropriate roles */}
           {/* Protected Routes - Accessible by authenticated users with appropriate roles */}

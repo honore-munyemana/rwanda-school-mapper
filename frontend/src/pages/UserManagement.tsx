@@ -45,7 +45,6 @@ export default function UserManagement() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [addName, setAddName] = useState('');
   const [addEmail, setAddEmail] = useState('');
-  const [addPassword, setAddPassword] = useState('');
   const [addRole, setAddRole] = useState('mapper');
   const [isAdding, setIsAdding] = useState(false);
 
@@ -100,11 +99,6 @@ export default function UserManagement() {
     e.preventDefault();
     if (!token) return;
 
-    if (addPassword.length < 6) {
-      toast.error('Password must be at least 6 characters.');
-      return;
-    }
-
     setIsAdding(true);
     try {
       const res = await fetch(`${API_BASE}/users`, {
@@ -116,17 +110,15 @@ export default function UserManagement() {
         body: JSON.stringify({
           name: addName,
           email: addEmail,
-          password: addPassword,
           role: addRole,
         }),
       });
 
       const data = await res.json();
       if (res.ok) {
-        toast.success('User created successfully.');
+        toast.success('User invited successfully.');
         setAddName('');
         setAddEmail('');
-        setAddPassword('');
         setAddRole('mapper');
         setIsAddOpen(false);
         fetchUsers();
@@ -408,22 +400,6 @@ export default function UserManagement() {
                   className="bg-black/40 border-white/10 h-10 text-[#EEE8DC] pl-10 rounded-none focus-visible:ring-0"
                 />
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-[#8A9BAD]/40" />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="font-mono text-[9px] uppercase tracking-wider text-[#8A9BAD]">Password (min 6 chars)</Label>
-              <div className="relative">
-                <Input
-                  required
-                  type="password"
-                  disabled={isAdding}
-                  value={addPassword}
-                  onChange={(e) => setAddPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="bg-black/40 border-white/10 h-10 text-[#EEE8DC] pl-10 rounded-none focus-visible:ring-0"
-                />
-                <Key className="absolute left-3 top-3 h-4 w-4 text-[#8A9BAD]/40" />
               </div>
             </div>
 

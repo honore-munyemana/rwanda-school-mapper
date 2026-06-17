@@ -1,8 +1,10 @@
 import express from "express";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import pool from "../config/db.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import roleMiddleware from "../middleware/roleMiddleware.js";
+import { sendActivationEmail } from "../utils/mailer.js";
 
 const router = express.Router();
 
@@ -48,13 +50,8 @@ router.post("/", async (req, res) => {
     const { name, email, password, role } = req.body;
 
     // Validate fields
-    if (!name || !email || !password || !role) {
-      return res.status(400).json({ error: "All fields (name, email, password, role) are required" });
-    }
-
-    // Validate password length
-    if (password.length < 6) {
-      return res.status(400).json({ error: "Password must be at least 6 characters." });
+    if (!name || !email || !role) {
+      return res.status(400).json({ error: "Name, email, and role are required" });
     }
 
     // Validate role
@@ -64,23 +61,58 @@ router.post("/", async (req, res) => {
     }
 
     // Check if email already exists
-    const userCheck = await pool.query("SELECT id FROM users WHERE email = $1", [email]);
+    const userCheck = await pool.query("SELECT id, is_verified FROM users WHERE email = $1", [email]);
     if (userCheck.rows.length > 0) {
+      const existingUser = userCheck.rows[0];
+      if (existingUser.is_verified === false) {
+        return res.status(400).json({ error: "This user has already been invited." });
+      }
       return res.status(400).json({ error: "Email already registered" });
     }
 
-    // Hash password
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    let result;
+    if (password) {
+      // Validate password length
+      if (password.length < 6) {
+        return res.status(400).json({ error: "Password must be at least 6 characters." });
+      }
+      // Hash password
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Insert user
-    const result = await pool.query(
-      "INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role, created_at",
-      [name, email, hashedPassword, role]
-    );
+      // Insert verified user (backward compatibility)
+      result = await pool.query(
+        "INSERT INTO users (name, email, password, role, is_verified) VALUES ($1, $2, $3, $4, true) RETURNING id, name, email, role, created_at",
+        [name, email, hashedPassword, role]
+      );
+    } else {
+      // Generate activation fields
+      const activationToken = crypto.randomBytes(32).toString("hex");
+      const otpCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+      const hashedOtp = await bcrypt.hash(otpCode, 10);
+      
+      const otpExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+      const activationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+      
+      // Random dummy password hash
+      const dummyPassword = crypto.randomBytes(32).toString("hex");
+      const hashedDummyPassword = await bcrypt.hash(dummyPassword, 10);
+
+      // Insert unverified user
+      result = await pool.query(
+        `INSERT INTO users 
+         (name, email, password, role, is_verified, activation_token, otp_code, otp_expiry, activation_expiry, otp_attempts) 
+         VALUES ($1, $2, $3, $4, false, $5, $6, $7, $8, 0) 
+         RETURNING id, name, email, role, created_at`,
+        [name, email, hashedDummyPassword, role, activationToken, hashedOtp, otpExpiry, activationExpiry]
+      );
+
+      // Send activation email (asynchronous background operation)
+      sendActivationEmail(email, name, role, activationToken, otpCode);
+    }
 
     res.status(201).json({
-      message: "User created successfully",
+      message: password ? "User created successfully" : "User invited successfully. Activation email sent.",
       user: result.rows[0]
     });
   } catch (error) {
