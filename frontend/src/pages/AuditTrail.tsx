@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -10,7 +11,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { History, Loader2 } from 'lucide-react';
+import { History, Loader2, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 interface VerificationAuditLog {
@@ -29,9 +31,15 @@ const resultStyles: Record<string, string> = {
 
 export default function AuditTrail() {
   const { token } = useAuth();
+  const location = useLocation();
   const [logs, setLogs] = useState<VerificationAuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState(() => {
+    return location.state && typeof location.state === 'object' && 'searchTerm' in location.state
+      ? (location.state as any).searchTerm
+      : '';
+  });
 
   useEffect(() => {
     const fetchAuditLogs = async () => {
@@ -70,6 +78,18 @@ export default function AuditTrail() {
     return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
   };
 
+  const filteredLogs = useMemo(() => {
+    return logs.filter((log) => {
+      if (!searchTerm) return true;
+      const term = searchTerm.toLowerCase();
+      return (
+        (log.school_name || '').toLowerCase().includes(term) ||
+        (log.verifier_email || '').toLowerCase().includes(term) ||
+        (log.result || '').toLowerCase().includes(term)
+      );
+    });
+  }, [logs, searchTerm]);
+
   return (
     <DashboardLayout>
       <div className="space-y-6 pb-10">
@@ -83,6 +103,17 @@ export default function AuditTrail() {
           </p>
         </div>
 
+        <div className="flex items-center max-w-sm relative group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8A9BAD]/40 group-focus-within:text-[#C4622D]" />
+          <Input
+            type="text"
+            placeholder="Filter audit trail by school, verifier, result..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 h-10 bg-[#141C25]/80 border-white/5 focus-visible:ring-1 focus-visible:ring-[#C4622D]/50 rounded-lg text-xs text-white"
+          />
+        </div>
+
         <div className="bg-[#141C25]/85 rounded-xl border border-white/5 overflow-hidden shadow-xl">
           {loading ? (
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-[#8A9BAD]">
@@ -93,10 +124,10 @@ export default function AuditTrail() {
             <div className="py-16 text-center">
               <p className="font-mono text-sm text-red-400">{error}</p>
             </div>
-          ) : logs.length === 0 ? (
+          ) : filteredLogs.length === 0 ? (
             <div className="py-16 text-center">
               <p className="font-mono text-xs text-[#8A9BAD] uppercase tracking-widest">
-                No verification events recorded yet
+                No matching verification events recorded
               </p>
             </div>
           ) : (
@@ -121,7 +152,7 @@ export default function AuditTrail() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {logs.map((log) => (
+                {filteredLogs.map((log) => (
                   <TableRow key={log.id} className="border-white/5 hover:bg-white/5">
                     <TableCell className="font-medium text-[#EEE8DC]">
                       {log.school_name || 'Unknown School'}

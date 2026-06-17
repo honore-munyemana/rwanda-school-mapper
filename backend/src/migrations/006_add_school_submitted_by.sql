@@ -1,0 +1,2 @@
+ALTER TABLE schools
+ADD COLUMN IF NOT EXISTS submitted_by INTEGER REFERENCES users(id);

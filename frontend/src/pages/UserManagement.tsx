@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -36,9 +37,14 @@ const roleLabels: Record<string, string> = {
 
 export default function UserManagement() {
   const { token, user: currentUser } = useAuth();
+  const location = useLocation();
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(() => {
+    return location.state && typeof location.state === 'object' && 'searchTerm' in location.state
+      ? (location.state as any).searchTerm
+      : '';
+  });
   const [roleFilter, setRoleFilter] = useState('all');
 
   // Add User Form State

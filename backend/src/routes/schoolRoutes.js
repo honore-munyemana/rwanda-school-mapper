@@ -28,12 +28,12 @@ router.post("/", authMiddleware, roleMiddleware("admin", "mapper"), async (req, 
     const smart_score = (net ? 1 : 0) + (smart ? 1 : 0) + (play ? 1 : 0) + (elec ? 1 : 0);
 
     const query = `
-      INSERT INTO schools (name, district, location, has_internet, has_smart_classroom, has_playground, has_electricity, smart_score, school_type, education_level)
-      VALUES ($1, $2, ST_SetSRID(ST_MakePoint($3, $4), 4326), $5, $6, $7, $8, $9, $10, $11)
+      INSERT INTO schools (name, district, location, has_internet, has_smart_classroom, has_playground, has_electricity, smart_score, school_type, education_level, submitted_by)
+      VALUES ($1, $2, ST_SetSRID(ST_MakePoint($3, $4), 4326), $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING *;
     `;
 
-    const values = [name, district, longitude, latitude, net, smart, play, elec, smart_score, school_type, education_level];
+    const values = [name, district, longitude, latitude, net, smart, play, elec, smart_score, school_type, education_level, req.user.id];
 
     const result = await pool.query(query, values);
 

@@ -1,9 +1,9 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { AppSidebar } from './AppSidebar';
 import { SidebarProvider, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
-import { Bell, Search, User, Globe } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Bell, User, Globe } from 'lucide-react';
+import { GlobalSearch } from './GlobalSearch';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -21,7 +21,6 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const [searchQuery, setSearchQuery] = useState('');
   const { user, logout } = useAuth();
 
   return (
@@ -38,19 +37,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <span className="text-[#D4A847] font-bold">MINEDUC_KIGALI_HQ</span>
             </div>
 
-            {/* Search Bar - Precision Search */}
-            <div className="flex-1 max-w-xl">
-              <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8A9BAD]/40 group-focus-within:text-[#C4622D] transition-colors" />
-                <Input
-                  type="search"
-                  placeholder="Query National Database (Schools, Indices, Coordinates)..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 h-11 bg-black/20 border-white/5 focus-visible:ring-1 focus-visible:ring-[#C4622D]/50 rounded-lg font-mono text-xs text-[#EEE8DC] placeholder:text-[#8A9BAD]/30"
-                />
-              </div>
-            </div>
+            {/* Search Bar - Global Database Query */}
+            <GlobalSearch />
 
             {/* Right side actions */}
             <div className="flex items-center gap-5">

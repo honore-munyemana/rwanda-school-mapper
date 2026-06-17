@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useData } from '@/context/DataContext';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
@@ -18,8 +19,17 @@ interface SchoolItem {
 export default function Reports() {
   const { stats } = useData();
   const { token, user } = useAuth();
-  const [reportType, setReportType] = useState<string>('summary');
-  const [selectedSchoolId, setSelectedSchoolId] = useState<string>('');
+  const location = useLocation();
+  const [reportType, setReportType] = useState<string>(() => {
+    return location.state && typeof location.state === 'object' && 'reportType' in location.state
+      ? (location.state as any).reportType
+      : 'summary';
+  });
+  const [selectedSchoolId, setSelectedSchoolId] = useState<string>(() => {
+    return location.state && typeof location.state === 'object' && 'selectedSchoolId' in location.state
+      ? String((location.state as any).selectedSchoolId)
+      : '';
+  });
   const [schoolsList, setSchoolsList] = useState<SchoolItem[]>([]);
   const [loadingSchools, setLoadingSchools] = useState<boolean>(false);
   const [generating, setGenerating] = useState<boolean>(false);
@@ -70,7 +80,7 @@ export default function Reports() {
           
           setSchoolsList(list);
           if (list.length > 0) {
-            setSelectedSchoolId(String(list[0].id));
+            setSelectedSchoolId(prev => prev || String(list[0].id));
           }
         } catch (err) {
           console.error(err);

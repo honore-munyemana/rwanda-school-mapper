@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { School } from '@/data/rwandaSchools';
 import { Button } from '@/components/ui/button';
@@ -64,10 +65,25 @@ const statusStyles: Record<string, string> = {
 
 export default function SchoolsRegistry() {
   const { schools, loading } = useBackendSchools();
-  const [searchQuery, setSearchQuery] = useState('');
+  const location = useLocation();
+  const [searchQuery, setSearchQuery] = useState(() => {
+    return location.state && typeof location.state === 'object' && 'searchQuery' in location.state
+      ? (location.state as any).searchQuery
+      : '';
+  });
   const [statusFilter, setStatusFilter] = useState<VerificationStatus>('All');
   const [districtFilter, setDistrictFilter] = useState<string>('All');
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
+
+  useEffect(() => {
+    if (schools.length > 0 && location.state && typeof location.state === 'object' && 'selectedSchoolId' in location.state) {
+      const schId = String((location.state as any).selectedSchoolId);
+      const found = schools.find((s) => String(s.id) === schId);
+      if (found) {
+        setSelectedSchool(found);
+      }
+    }
+  }, [schools, location.state]);
 
   const filteredSchools = schools.filter((school) => {
     if (statusFilter !== 'All' && school.verificationStatus !== statusFilter) return false;
