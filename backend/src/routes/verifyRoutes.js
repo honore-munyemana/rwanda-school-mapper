@@ -2,6 +2,7 @@ import express from "express";
 import pool from "../config/db.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import roleMiddleware from "../middleware/roleMiddleware.js";
+import { createNotification, notifyAllUsersOfRole } from "../utils/notificationHelper.js";
 
 const router = express.Router();
 
@@ -43,7 +44,9 @@ router.post("/", authMiddleware, roleMiddleware("admin", "validator"), async (re
       ST_Distance(
         location::geography,
         ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
-      ) AS distance_meters
+      ) AS distance_meters,
+      submitted_by,
+      name
       FROM schools
       WHERE id = $3;
     `;
@@ -56,7 +59,7 @@ router.post("/", authMiddleware, roleMiddleware("admin", "validator"), async (re
       return res.status(404).json({ error: "School not found" });
     }
 
-    const { is_within, distance_meters } = checkResult.rows[0];
+    const { is_within, distance_meters, submitted_by, name: schoolName } = checkResult.rows[0];
     const distanceMeters = Number(parseFloat(distance_meters).toFixed(2));
 
     if (!is_within) {
@@ -68,6 +71,29 @@ router.post("/", authMiddleware, roleMiddleware("admin", "validator"), async (re
         distanceMeters,
         result: "rejected",
       });
+
+      // Send rejection notification to the Mapper
+      if (submitted_by) {
+        await createNotification(
+          submitted_by,
+          "School Rejected",
+          `School has been rejected.`,
+          "REJECTION",
+          schoolId,
+          "/schools"
+        );
+      }
+
+      // Send verification completed notification to Admins
+      await notifyAllUsersOfRole(
+        "admin",
+        "School Verification Completed",
+        "School verification completed.",
+        "VERIFICATION",
+        schoolId,
+        "/audit"
+      );
+
       return res.status(400).json({ error: "Too far from school to verify" });
     }
 
@@ -96,6 +122,28 @@ router.post("/", authMiddleware, roleMiddleware("admin", "validator"), async (re
       distanceMeters,
       result: "verified",
     });
+
+    // Send approval notification to the Mapper
+    if (submitted_by) {
+      await createNotification(
+        submitted_by,
+        "School Approved",
+        `School has been approved.`,
+        "APPROVAL",
+        schoolId,
+        "/schools"
+      );
+    }
+
+    // Send verification completed notification to Admins
+    await notifyAllUsersOfRole(
+      "admin",
+      "School Verification Completed",
+      "School verification completed.",
+      "VERIFICATION",
+      schoolId,
+      "/audit"
+    );
 
     res.status(200).json({ message: "School verified successfully" });
   } catch (error) {

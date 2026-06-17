@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import pool from "../config/db.js";
 import { sendActivationEmail } from "../utils/mailer.js";
+import { notifyAllUsersOfRole } from "../utils/notificationHelper.js";
 
 export const register = async (req, res) => {
   try {
@@ -196,6 +197,14 @@ export const activate = async (req, res) => {
 
     // Notification hook (optional, prepared as requested)
     console.log(`Notification Hook: ${user.role.charAt(0).toUpperCase() + user.role.slice(1)} ${user.name} activated their account.`);
+    await notifyAllUsersOfRole(
+      "admin",
+      "User Activated Account",
+      "User successfully activated account.",
+      "ACTIVATION",
+      user.id,
+      "/users"
+    );
 
     res.json({ message: "Account activated successfully. You can now log in." });
   } catch (error) {

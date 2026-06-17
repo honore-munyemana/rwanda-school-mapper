@@ -2,9 +2,10 @@ import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { AppSidebar } from './AppSidebar';
 import { SidebarProvider, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
-import { Bell, User, Globe } from 'lucide-react';
+import { User, Globe } from 'lucide-react';
 import { GlobalSearch } from './GlobalSearch';
 import { Button } from '@/components/ui/button';
+import { NotificationBell } from './NotificationBell';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,10 +44,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             {/* Right side actions */}
             <div className="flex items-center gap-5">
               {/* Notifications - Alert Center */}
-              <Button variant="ghost" size="icon" className="relative hover:bg-white/5 rounded-xl group">
-                <Bell className="h-5 w-5 text-[#8A9BAD] group-hover:text-[#D4A847] transition-colors" />
-                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#C4622D] shadow-[0_0_8px_rgba(196,98,45,0.8)] animate-pulse" />
-              </Button>
+              <NotificationBell />
 
               {/* User Menu - Command Profile */}
               <DropdownMenu>

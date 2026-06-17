@@ -9,6 +9,7 @@ import reportRoutes from "./routes/reportRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import searchRoutes from "./routes/searchRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 import pool from "./config/db.js";
 import { runMigrations } from "./migrations/runMigrations.js";
 import express from "express";
@@ -48,6 +49,7 @@ app.use("/reports", reportRoutes);
 app.use("/users", userRoutes);
 app.use("/profile", profileRoutes);
 app.use("/search", searchRoutes);
+app.use("/notifications", notificationRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 runMigrations()

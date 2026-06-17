@@ -5,6 +5,7 @@ import pool from "../config/db.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import roleMiddleware from "../middleware/roleMiddleware.js";
 import { sendActivationEmail } from "../utils/mailer.js";
+import { notifyAllUsersOfRole } from "../utils/notificationHelper.js";
 
 const router = express.Router();
 
@@ -111,9 +112,22 @@ router.post("/", async (req, res) => {
       sendActivationEmail(email, name, role, activationToken, otpCode);
     }
 
+    const newUser = result.rows[0];
+    const roleLabel = newUser.role === "validator" ? "validator" : "mapper";
+    if (newUser.role === "validator" || newUser.role === "mapper") {
+      await notifyAllUsersOfRole(
+        "admin",
+        "New User Invited",
+        `New ${roleLabel} invited.`,
+        "INVITE",
+        newUser.id,
+        "/users"
+      );
+    }
+
     res.status(201).json({
       message: password ? "User created successfully" : "User invited successfully. Activation email sent.",
-      user: result.rows[0]
+      user: newUser
     });
   } catch (error) {
     console.error("Create user error:", error);

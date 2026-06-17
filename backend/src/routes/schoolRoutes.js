@@ -2,6 +2,7 @@ import express from "express";
 import pool from "../config/db.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import roleMiddleware from "../middleware/roleMiddleware.js";
+import { createNotification, notifyAllUsersOfRole } from "../utils/notificationHelper.js";
 
 const router = express.Router();
 
@@ -36,8 +37,31 @@ router.post("/", authMiddleware, roleMiddleware("admin", "mapper"), async (req, 
     const values = [name, district, longitude, latitude, net, smart, play, elec, smart_score, school_type, education_level, req.user.id];
 
     const result = await pool.query(query, values);
+    const newSchool = result.rows[0];
 
-    res.status(201).json(result.rows[0]);
+    // Notify all validators
+    await notifyAllUsersOfRole(
+      "validator",
+      "New School Awaiting Verification",
+      "New school awaiting verification.",
+      "SUBMISSION",
+      newSchool.id,
+      "/verification"
+    );
+
+    // Notify the submitting mapper if the current user is a mapper
+    if (req.user.role === "mapper") {
+      await createNotification(
+        req.user.id,
+        "School Submitted",
+        "School submitted successfully.",
+        "SUBMISSION",
+        newSchool.id,
+        "/mapper"
+      );
+    }
+
+    res.status(201).json(newSchool);
 
   } catch (error) {
     res.status(500).json({ error: error.message });
